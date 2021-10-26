@@ -32,7 +32,7 @@ public class Personaje {
 		this.y+=5;
 	}
 	public void saltar(Juego j) {
-		if(this.y == j.getExtremoSuperior()) return;
+		if(this.y <= j.getExtremoSuperior()) return;
 		this.y -= 20;
 	}
 	

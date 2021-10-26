@@ -10,6 +10,7 @@ public class Juego extends InterfaceJuego{
 	// El objeto Entorno que controla el tiempo y otros
 	private Entorno entorno;
 	private Personaje barbariana;
+	private Piso instancePisos;
 	
 	//ancho y alto del juego;
 	private int heigth;
@@ -24,7 +25,7 @@ public class Juego extends InterfaceJuego{
 
 	Juego(){
 		//Inicializo los extremos
-		this.setearExtremos();
+		this._setearExtremos();
 		
 		this.cantPisos = 4;
 		
@@ -34,8 +35,8 @@ public class Juego extends InterfaceJuego{
 		//Inicializa el personaje
 		this.barbariana = new Personaje(this, "Barbariana");
 	
-		// dibujo los pisos en el mapa
-		this.inicializarPisos();
+		// crea los pisos con sus respectivas ubicaciones
+		this._inicializarPisos();
 		
 		// Inicia el juego!
 		this.entorno.iniciar();
@@ -43,9 +44,12 @@ public class Juego extends InterfaceJuego{
 
 	// Metodo que se ejecuta todo el tiempo
 	public void tick(){
-		// Procesamiento de un instante de tiempo
-		// ...
+		
+		//dibujar el personaje
 		this.barbariana.dibujarse(entorno);
+		
+		//dibuja los pisos
+		this._dibujarPisos();
 		
 		if(this.entorno.estaPresionada(this.entorno.TECLA_DERECHA)) {
 			this.barbariana.moverDerecha(this);
@@ -63,7 +67,7 @@ public class Juego extends InterfaceJuego{
 	}
 	
 	
-	private void setearExtremos() {
+	private void _setearExtremos() {
 		this.heigth = 800;
 		this.width = 600;
 		this.extremoSuperior = 15;
@@ -72,17 +76,25 @@ public class Juego extends InterfaceJuego{
 		this.extremoDerecho = this.width + 190;
 	}
 	
-	private void inicializarPisos() {
+	private void _inicializarPisos() {
 		Piso[] pisosList = new Piso[this.cantPisos];
-		int xPiso = this.extremoDerecho;
-		int yPiso = 100;
-		int anchoPiso = this.width;
+		int xPiso = this.extremoIzquierdo;
+		int yPiso = this.extremoInferior + 15;
+		int anchoPiso = 2000;
 		for(int i=0; i < this.cantPisos; i++) {
 			Piso p = new Piso(xPiso,yPiso,anchoPiso,1);
 			pisosList[i] = p;
-			yPiso = yPiso - 50;
+			yPiso = yPiso - 150;
+			xPiso = xPiso == this.extremoDerecho ? this.extremoIzquierdo : this.extremoDerecho;
+			anchoPiso = this.width * 2;
 		}
 		this.pisos = pisosList;
+	}
+	
+	private void _dibujarPisos() {
+		for(Piso piso : this.pisos) {
+			piso.dibujarse(entorno);
+		}
 	}
 	
 	public Piso[] getPisos() {
