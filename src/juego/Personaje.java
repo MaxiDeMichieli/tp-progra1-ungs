@@ -27,8 +27,13 @@ public class Personaje {
 		this.x = this.x + 5;
 	}
 	
-	public void saltar() {
-		
+	public void gravedad(Juego j) {
+		if(this.y == j.getExtremoInferior()) return;
+		this.y+=5;
+	}
+	public void saltar(Juego j) {
+		if(this.y == j.getExtremoSuperior()) return;
+		this.y -= 20;
 	}
 	
 	public void agachar() {

@@ -53,6 +53,13 @@ public class Juego extends InterfaceJuego{
 		if(this.entorno.estaPresionada(this.entorno.TECLA_IZQUIERDA)) {
 			this.barbariana.moverIzquierda(this);
 		}
+		if (this.entorno.estaPresionada(this.entorno.TECLA_ARRIBA)) {
+			this.barbariana.saltar(this);
+		}
+		if (this.entorno.estaPresionada(this.entorno.TECLA_ABAJO)) {
+			this.barbariana.agachar();
+		}
+		this.barbariana.gravedad(this);
 	}
 	
 	
