@@ -7,6 +7,7 @@ public class Juego extends InterfaceJuego {
 	// El objeto Entorno que controla el tiempo y otros
 	private Entorno entorno;
 	private Personaje barbariana;
+	private Computadora computadora;
 
 	// Ancho y alto del juego;
 	private int height;
@@ -29,6 +30,8 @@ public class Juego extends InterfaceJuego {
 
 		// Inicializa el personaje
 		this.barbariana = new Personaje("Barbariana");
+		
+		this.computadora = new Computadora(this.entorno);
 
 		// crea los pisos con sus respectivas ubicaciones
 		this._inicializarPisos();
@@ -45,6 +48,9 @@ public class Juego extends InterfaceJuego {
 
 		// dibuja los pisos
 		this._dibujarPisos();
+		
+		//dibuja computadora
+		this.computadora.dibujarse(this.entorno);
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA)) {
 			this.barbariana.moverDerecha(this);
