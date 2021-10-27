@@ -23,6 +23,22 @@ public class Piso {
 		e.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.white);
 	}
 
+	public int posicionSuperior() {
+		return this.y - this.alto / 2;
+	}
+
+	public int posicionInferior() {
+		return this.y + this.alto / 2;
+	}
+
+	public int posicionExtremoIzquierdo() {
+		return this.x - this.ancho / 2;
+	}
+
+	public int posicionExtremoDerecho() {
+		return this.x + this.ancho / 2;
+	}
+
 	public int getAncho() {
 		return ancho;
 	}
