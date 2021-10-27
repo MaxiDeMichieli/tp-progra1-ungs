@@ -49,11 +49,12 @@ public class Juego extends InterfaceJuego {
 		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA)) {
 			this.barbariana.moverDerecha(this);
 		}
+
 		if (this.entorno.estaPresionada(this.entorno.TECLA_IZQUIERDA)) {
 			this.barbariana.moverIzquierda(this);
 		}
 		// si presiono flecha arriba y salta
-		if (this.entorno.estaPresionada(this.entorno.TECLA_ARRIBA) && this.barbariana.colisionPiso(this.pisos) != -1) {
+		if (this.entorno.estaPresionada(this.entorno.TECLA_ARRIBA) && this.barbariana.colisionPiso(this.pisos)) {
 			this.barbariana.saltar(this);
 		}
 
@@ -63,11 +64,15 @@ public class Juego extends InterfaceJuego {
 			this.barbariana.pararse();
 		}
 
+		if (this.entorno.estaPresionada('u') && this.barbariana.puedeSubirPiso(this.pisos)) {
+			this.barbariana.subirPiso(this.pisos, this.barbariana.pisoActual(this.pisos) + 1);
+		}
+
 		if (this.barbariana.getSaltando()) {
 			this.barbariana.procesarSalto(this.contadorTicks);
 		}
 
-		if (this.barbariana.colisionPiso(this.pisos) == -1 && !this.barbariana.getSaltando()) {
+		if (!this.barbariana.colisionPiso(this.pisos) && !this.barbariana.getSaltando()) {
 			this.barbariana.gravedad(this);
 		}
 

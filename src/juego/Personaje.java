@@ -13,8 +13,8 @@ public class Personaje {
 	private int ultimoSalto;
 
 	Personaje(String name) {
-		this.x = 50;
-		this.y = 115;
+		this.x = 500;
+		this.y = 15;
 		this.ancho = 30;
 		this.alto = 60;
 		this.altoInicial = 60;
@@ -22,13 +22,13 @@ public class Personaje {
 	}
 
 	public void moverIzquierda(Juego j) {
-		if (this.posicionExtremoIzquierdo() <= 0 || this.colisionPisoLateral(j.getPisos()) != -1)
+		if (this.posicionExtremoIzquierdo() <= 0 || this.colisionPisoLateral(j.getPisos()))
 			return;
 		this.x = this.x - 5;
 	}
 
 	public void moverDerecha(Juego j) {
-		if (this.posicionExtremoDerecho() >= j.getWidth() || this.colisionPisoLateral(j.getPisos()) != -1)
+		if (this.posicionExtremoDerecho() >= j.getWidth() || this.colisionPisoLateral(j.getPisos()))
 			return;
 		this.x = this.x + 5;
 	}
@@ -65,23 +65,35 @@ public class Personaje {
 		e.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.GREEN);
 	}
 
-	public int colisionPiso(Piso[] pisos) {
+	public boolean colisionPiso(Piso[] pisos) {
 		for (Piso piso : pisos) {
 			if (piso.posicionSuperior() == this.posicionPies()
 					&& this.posicionExtremoIzquierdo() <= piso.posicionExtremoDerecho()
 					&& this.posicionExtremoDerecho() >= piso.posicionExtremoIzquierdo()) {
 				this.saltando = false;
-				return piso.getNumero();
+				return true;
 			}
 		}
-		return -1;
+		return false;
 	}
 
-	public int colisionPisoLateral(Piso[] pisos) {
+	public boolean colisionPisoLateral(Piso[] pisos) {
 		for (Piso piso : pisos) {
 			if (piso.posicionSuperior() < this.posicionPies() && piso.posicionInferior() > this.posicionCabeza()
 					&& this.posicionExtremoIzquierdo() <= piso.posicionExtremoDerecho()
 					&& this.posicionExtremoDerecho() >= piso.posicionExtremoIzquierdo()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public int pisoActual(Piso[] pisos) {
+		for (Piso piso : pisos) {
+			if (piso.posicionSuperior() == this.posicionPies()
+					&& this.posicionExtremoIzquierdo() <= piso.posicionExtremoDerecho()
+					&& this.posicionExtremoDerecho() >= piso.posicionExtremoIzquierdo()) {
+				this.saltando = false;
 				return piso.getNumero();
 			}
 		}
@@ -94,6 +106,36 @@ public class Personaje {
 			return;
 		}
 		this.y -= 2;
+	}
+
+	public boolean puedeSubirPiso(Piso[] pisos) {
+		int pisoActual = this.pisoActual(pisos);
+		try {
+			if (pisoActual != -1 && (this.posicionExtremoIzquierdo() >= pisos[pisoActual + 1].posicionExtremoDerecho()
+					|| this.posicionExtremoDerecho() <= pisos[pisoActual + 1].posicionExtremoIzquierdo()))
+				return true;
+		} catch (Exception e) {
+			return false;
+		}
+		return false;
+	}
+
+	public void subirPiso(Piso[] pisos, int numeroDePiso) {
+		try {
+			Piso pisoASubir = pisos[numeroDePiso];
+			if (Math.abs(pisoASubir.posicionExtremoDerecho() - this.x) < Math
+					.abs(pisoASubir.posicionExtremoIzquierdo() - this.x)) {
+				this.y = pisoASubir.posicionSuperior() - this.alto / 2;
+				this.x = pisoASubir.posicionExtremoDerecho() - this.ancho / 2;
+			}
+			if (Math.abs(pisoASubir.posicionExtremoIzquierdo() - this.x) < Math
+					.abs(pisoASubir.posicionExtremoDerecho() - this.x)) {
+				this.y = pisoASubir.posicionSuperior() - this.alto / 2;
+				this.x = pisoASubir.posicionExtremoIzquierdo() + this.ancho / 2;
+			}
+		} catch (Exception e) {
+			return;
+		}
 	}
 
 	public int posicionExtremoDerecho() {
