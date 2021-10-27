@@ -20,6 +20,7 @@ public class Juego extends InterfaceJuego{
 	private int extremoDerecho;
 	private int extremoIzquierdo;
 	
+	private boolean bloquearSalto=false;
 	private int cantPisos;
 	private Piso[] pisos;
 
@@ -57,9 +58,16 @@ public class Juego extends InterfaceJuego{
 		if(this.entorno.estaPresionada(this.entorno.TECLA_IZQUIERDA)) {
 			this.barbariana.moverIzquierda(this);
 		}
-		if (this.entorno.estaPresionada(this.entorno.TECLA_ARRIBA)) {
-			this.barbariana.saltar(this);
+		//si presiono flecha arriba y el bloquearSalto=false: salta y bloquea el salto
+		if (this.entorno.estaPresionada(this.entorno.TECLA_ARRIBA) && !this.bloquearSalto) {
+			this.barbariana.saltar(this);			
+			this.bloquearSalto=true;
 		}
+		//si no esta presionando arriba, el salto esta bloqueado y esta tocando el piso: lo desbloquea
+		if (!this.entorno.estaPresionada(this.entorno.TECLA_ARRIBA) && this.bloquearSalto && this.barbariana.colisionPiso()) {
+			this.bloquearSalto=false;				
+		}
+		
 		if (this.entorno.estaPresionada(this.entorno.TECLA_ABAJO)) {
 			this.barbariana.agachar();
 		}

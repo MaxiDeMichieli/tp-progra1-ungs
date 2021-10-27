@@ -9,12 +9,14 @@ public class Personaje {
 	private int ancho, alto;
 	private String imagen = "./barbariana.jpeg";
 	
+	
 	Personaje(Juego instanceJuego, String name){
 		this.x = instanceJuego.getExtremoIzquierdo();
 		this.y = instanceJuego.getExtremoInferior();
 		this.ancho = 30;
 		this.alto = 30;
 		this.name = name;
+	
 	}
 	
 	public void moverIzquierda(Juego j){
@@ -29,11 +31,11 @@ public class Personaje {
 	
 	public void gravedad(Juego j) {
 		if(this.y == j.getExtremoInferior()) return;
-		this.y+=5;
+		this.y+=2;
 	}
 	public void saltar(Juego j) {
 		if(this.y <= j.getExtremoSuperior()) return;
-		this.y -= 20;
+		this.y -= 100;
 	}
 	
 	public void agachar() {
@@ -42,6 +44,10 @@ public class Personaje {
 	
 	public void dibujarse(Entorno e) {
 		e.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.GREEN);
+	}
+	
+	public boolean colisionPiso() {
+		return false;
 	}
 
 	public String getName() {
