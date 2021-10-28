@@ -12,7 +12,7 @@ public class Computadora {
 	 */
 	Computadora(Entorno e){
 		this.x = e.ancho() - 50;
-		this.y = 80;
+		this.y = 75;
 		this.ancho = 50;
 		this.alto = 50;
 	}
@@ -21,6 +21,15 @@ public class Computadora {
 		e.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.BLUE);
 	}
 	
+	/**
+	 * Retorna true si la posicion recibida esta tocando a la computadora
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public boolean estaTocando(int x, int y) {
+		return this.x <= x && this.y == y;
+	}
 	
 	public int getX() {
 		return x;
