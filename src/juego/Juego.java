@@ -40,7 +40,7 @@ public class Juego extends InterfaceJuego {
 	};
 
 	Juego() {
-		
+
 		// Inicializa alto y ancho
 		this.height = 600;
 		this.width = 800;
@@ -86,16 +86,12 @@ public class Juego extends InterfaceJuego {
 		// dibuja dinos
 		for (int i = 0; i < dinos.length; i++) {
 			if (this.dinos[i] != null)
-				this.dinos[i].dibujarse(entorno);
+				this.dinos[i].dibujarse(this.entorno);
+			if (!this.dinos[i].colisionPiso(this.pisos))
+				//this.dinos[i].gravedad();
+				
+				this.dinos[i].avanzar();
 		}
-
-		for (int i = 0; i < dinos.length; i++) {
-			if (this.dinos[i].getX()+this.dinos[i].getAncho()==800)
-				this.dinos[i].avanzarIzq();
-			if (this.dinos[i].getX()==0)
-				this.dinos[i].avanzarDer();
-		}
-			
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA)) {
 			this.barbariana.moverDerecha(this);
@@ -135,6 +131,7 @@ public class Juego extends InterfaceJuego {
 		if (!this.barbariana.colisionPiso(this.pisos) && !this.barbariana.getSaltando()) {
 			this.barbariana.gravedad(this);
 		}
+
 		entorno.cambiarFont(Font.SANS_SERIF, 25, Color.RED);
 		entorno.escribirTexto("Enemigos Eliminados: " + this.puntos, 15, 25);
 		entorno.escribirTexto("Vidas: " + this.vidas, 80, 585);

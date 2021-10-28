@@ -14,8 +14,8 @@ public class Velocirraptor {
 	private Direccion direccion;
 
 	public Velocirraptor() {
-		this.x = 800;
-		this.y = 30;
+		this.x = 770;
+		this.y = 60;
 		this.ancho = 30;
 		this.alto = 60;
 		this.velocidad = 2;
@@ -23,7 +23,7 @@ public class Velocirraptor {
 	}
 
 	public void dibujarse(Entorno entorno) {
-		entorno.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.white);
+		entorno.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.red);
 	}
 
 	public void gravedad(Juego j) {
@@ -32,12 +32,48 @@ public class Velocirraptor {
 		this.y += 2.5;
 	}
 
-	public void avanzarIzq() {
-		this.x -= this.velocidad;
+	public void cambioDireccion() {
+		if (this.direccion.equals(Direccion.IZQUIERDA))
+			this.direccion = Direccion.DERECHA;
+		else
+			this.direccion = Direccion.IZQUIERDA;
 	}
 
-	public void avanzarDer() {
-		this.x += this.velocidad;
+	public void avanzar() {
+		if (this.x>=20 && this.direccion.equals(Direccion.IZQUIERDA))
+			this.x-=velocidad;
+			if (this.x==20)
+				this.direccion = Direccion.DERECHA;
+		if (this.x<=790 && this.direccion.equals(Direccion.DERECHA))
+			this.x+=velocidad;
+			if (this.x==790)
+				this.direccion = Direccion.IZQUIERDA;
+	}
+
+	public void gravedad() {
+		this.y += 2.5;
+	}
+
+	public boolean colisionPiso(Piso[] pisos) {
+		for (Piso piso : pisos) {
+			if (piso.posicionSuperior() == this.posicionPies()
+					&& this.posicionExtremoIzquierdo() <= piso.posicionExtremoDerecho()
+					&& this.posicionExtremoDerecho() >= piso.posicionExtremoIzquierdo()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean colisionPisoLateral(Piso[] pisos) {
+		for (Piso piso : pisos) {
+			if (piso.posicionSuperior() < this.posicionPies() && piso.posicionInferior() > this.posicionCabeza()
+					&& this.posicionExtremoIzquierdo() <= piso.posicionExtremoDerecho()
+					&& this.posicionExtremoDerecho() >= piso.posicionExtremoIzquierdo()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public int posicionExtremoDerecho() {
