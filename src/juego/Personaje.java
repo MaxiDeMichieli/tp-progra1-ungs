@@ -10,7 +10,6 @@ public class Personaje {
 	private String name;
 	private int x, y;
 	private int ancho, alto, altoInicial;
-	private String imagen = "./barbariana.jpeg";
 	private boolean saltando;
 	private int ultimoSalto;
 	private Direccion direccion;

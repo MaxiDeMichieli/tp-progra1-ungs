@@ -1,5 +1,8 @@
 package juego;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Image;
 import java.util.function.Function;
 
 import entorno.Entorno;
@@ -12,6 +15,7 @@ public class Juego extends InterfaceJuego {
 	private Entorno entorno;
 	private Personaje barbariana;
 	private Computadora computadora;
+	private Velocirraptor[] dinos;
 
 	// Ancho y alto del juego;
 	private int height;
@@ -21,6 +25,9 @@ public class Juego extends InterfaceJuego {
 	private Piso[] pisos;
 
 	private int contadorTicks;
+
+	private int puntos;
+	private int vidas = 3;
 
 	private Lista<Rayo> rayos;
 	private Function<Nodo<Rayo>, Void> moverRayo = rayo -> {
@@ -33,6 +40,7 @@ public class Juego extends InterfaceJuego {
 	};
 
 	Juego() {
+		
 		// Inicializa alto y ancho
 		this.height = 600;
 		this.width = 800;
@@ -46,6 +54,13 @@ public class Juego extends InterfaceJuego {
 		this.barbariana = new Personaje("Barbariana");
 		this.rayos = new Lista<Rayo>();
 
+		// Inicializa dinos
+		this.dinos = new Velocirraptor[5];
+
+		for (int i = 0; i < dinos.length; i++) {
+			this.dinos[i] = new Velocirraptor();
+		}
+
 		this.computadora = new Computadora(this.entorno);
 
 		// crea los pisos con sus respectivas ubicaciones
@@ -53,6 +68,7 @@ public class Juego extends InterfaceJuego {
 
 		// Inicia el juego!
 		this.entorno.iniciar();
+
 	}
 
 	// Metodo que se ejecuta todo el tiempo
@@ -66,6 +82,20 @@ public class Juego extends InterfaceJuego {
 
 		// dibuja computadora
 		this.computadora.dibujarse(this.entorno);
+
+		// dibuja dinos
+		for (int i = 0; i < dinos.length; i++) {
+			if (this.dinos[i] != null)
+				this.dinos[i].dibujarse(entorno);
+		}
+
+		for (int i = 0; i < dinos.length; i++) {
+			if (this.dinos[i].getX()+this.dinos[i].getAncho()==800)
+				this.dinos[i].avanzarIzq();
+			if (this.dinos[i].getX()==0)
+				this.dinos[i].avanzarDer();
+		}
+			
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA)) {
 			this.barbariana.moverDerecha(this);
@@ -105,6 +135,9 @@ public class Juego extends InterfaceJuego {
 		if (!this.barbariana.colisionPiso(this.pisos) && !this.barbariana.getSaltando()) {
 			this.barbariana.gravedad(this);
 		}
+		entorno.cambiarFont(Font.SANS_SERIF, 25, Color.RED);
+		entorno.escribirTexto("Enemigos Eliminados: " + this.puntos, 15, 25);
+		entorno.escribirTexto("Vidas: " + this.vidas, 80, 585);
 
 		this.contadorTicks += 1;
 	}
