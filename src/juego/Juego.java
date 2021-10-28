@@ -135,7 +135,7 @@ public class Juego extends InterfaceJuego {
 		entorno.cambiarFont(Font.SANS_SERIF, 25, Color.RED);
 		entorno.escribirTexto("Enemigos Eliminados: " + this.puntos, 15, 25);
 		entorno.escribirTexto("Vidas: " + this.vidas, 80, 585);
-
+		
 		this.contadorTicks += 1;
 	}
 

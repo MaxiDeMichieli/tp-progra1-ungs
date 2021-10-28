@@ -31,39 +31,21 @@ public class Velocirraptor {
 			return;
 		this.y += 2.5;
 	}
-	
-	public void cambioDireccion() {
-		if (this.direccion.equals(Direccion.IZQUIERDA))
-			this.direccion = Direccion.DERECHA;
-		else
-			this.direccion = Direccion.IZQUIERDA;
-	}
 
 	public void avanzar() {
-		if (this.x>=20 && this.direccion.equals(Direccion.IZQUIERDA))
-			this.x-=velocidad;
-			if (this.x==20)
-				this.direccion = Direccion.DERECHA;
-		if (this.x<=790 && this.direccion.equals(Direccion.DERECHA))
-			this.x+=velocidad;
-			if (this.x==790)
-				this.direccion = Direccion.IZQUIERDA;
+		if (this.x >= 20 && this.direccion.equals(Direccion.IZQUIERDA))
+			this.x -= velocidad;
+		if (this.x == 20)
+			this.direccion = Direccion.DERECHA;
+		if (this.x <= 790 && this.direccion.equals(Direccion.DERECHA))
+			this.x += velocidad;
+		if (this.x == 790)
+			this.direccion = Direccion.IZQUIERDA;
 	}
 
 	public boolean colisionPiso(Piso[] pisos) {
 		for (Piso piso : pisos) {
 			if (piso.posicionSuperior() == this.posicionPies()
-					&& this.posicionExtremoIzquierdo() <= piso.posicionExtremoDerecho()
-					&& this.posicionExtremoDerecho() >= piso.posicionExtremoIzquierdo()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean colisionPisoLateral(Piso[] pisos) {
-		for (Piso piso : pisos) {
-			if (piso.posicionSuperior() < this.posicionPies() && piso.posicionInferior() > this.posicionCabeza()
 					&& this.posicionExtremoIzquierdo() <= piso.posicionExtremoDerecho()
 					&& this.posicionExtremoDerecho() >= piso.posicionExtremoIzquierdo()) {
 				return true;
