@@ -3,6 +3,8 @@ package juego;
 import java.awt.Color;
 
 import entorno.Entorno;
+import utils.Direccion;
+import utils.Lista;
 
 public class Personaje {
 	private String name;
@@ -11,26 +13,33 @@ public class Personaje {
 	private String imagen = "./barbariana.jpeg";
 	private boolean saltando;
 	private int ultimoSalto;
+	private Direccion direccion;
+	private int ultimoDisparo;
 
 	Personaje(String name) {
-		this.x = 500;
-		this.y = 15;
+		this.x = 50;
+		this.y = 505;
 		this.ancho = 30;
 		this.alto = 60;
 		this.altoInicial = 60;
 		this.name = name;
+		this.direccion = Direccion.DERECHA;
 	}
 
 	public void moverIzquierda(Juego j) {
 		if (this.posicionExtremoIzquierdo() <= 0 || this.colisionPisoLateral(j.getPisos()))
 			return;
-		this.x = this.x - 5;
+		this.x = this.x - 3;
+		if (this.direccion.equals(Direccion.DERECHA))
+			this.direccion = Direccion.IZQUIERDA;
 	}
 
 	public void moverDerecha(Juego j) {
 		if (this.posicionExtremoDerecho() >= j.getWidth() || this.colisionPisoLateral(j.getPisos()))
 			return;
-		this.x = this.x + 5;
+		this.x = this.x + 3;
+		if (this.direccion.equals(Direccion.IZQUIERDA))
+			this.direccion = Direccion.DERECHA;
 	}
 
 	public void gravedad(Juego j) {
@@ -58,11 +67,15 @@ public class Personaje {
 			this.y -= this.alto / 2;
 			this.alto = this.altoInicial;
 		}
-
 	}
 
 	public void dibujarse(Entorno e) {
 		e.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.GREEN);
+	}
+
+	public void disparar(Lista<Rayo> rayos, int contadorTicks) {
+		rayos.agregarAtras(new Rayo(this.x, this.y, this.direccion));
+		this.ultimoDisparo = contadorTicks;
 	}
 
 	public boolean colisionPiso(Piso[] pisos) {
@@ -196,5 +209,9 @@ public class Personaje {
 
 	public boolean getSaltando() {
 		return this.saltando;
+	}
+
+	public int getUltimoDisparo() {
+		return this.ultimoDisparo;
 	}
 }

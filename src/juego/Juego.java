@@ -1,7 +1,11 @@
 package juego;
 
+import java.util.function.Function;
+
 import entorno.Entorno;
 import entorno.InterfaceJuego;
+import utils.Lista;
+import utils.Nodo;
 
 public class Juego extends InterfaceJuego {
 	// El objeto Entorno que controla el tiempo y otros
@@ -18,6 +22,16 @@ public class Juego extends InterfaceJuego {
 
 	private int contadorTicks;
 
+	private Lista<Rayo> rayos;
+	private Function<Nodo<Rayo>, Void> moverRayo = rayo -> {
+		rayo.getElemento().moverse();
+		rayo.getElemento().dibujarse(this.entorno);
+		if (!rayo.getElemento().estaEnPantalla(this.entorno)) {
+			rayos.quitarPorId(rayo.getId());
+		}
+		return null;
+	};
+
 	Juego() {
 		// Inicializa alto y ancho
 		this.height = 600;
@@ -30,7 +44,8 @@ public class Juego extends InterfaceJuego {
 
 		// Inicializa el personaje
 		this.barbariana = new Personaje("Barbariana");
-		
+		this.rayos = new Lista<Rayo>();
+
 		this.computadora = new Computadora(this.entorno);
 
 		// crea los pisos con sus respectivas ubicaciones
@@ -48,8 +63,8 @@ public class Juego extends InterfaceJuego {
 
 		// dibuja los pisos
 		this._dibujarPisos();
-		
-		//dibuja computadora
+
+		// dibuja computadora
 		this.computadora.dibujarse(this.entorno);
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA)) {
@@ -74,6 +89,15 @@ public class Juego extends InterfaceJuego {
 			this.barbariana.subirPiso(this.pisos, this.barbariana.pisoActual(this.pisos) + 1);
 		}
 
+		if (this.entorno.estaPresionada(this.entorno.TECLA_ESPACIO) && this.barbariana.colisionPiso(this.pisos)
+				&& this.barbariana.getUltimoDisparo() + 50 <= this.contadorTicks) {
+			this.barbariana.disparar(this.rayos, this.contadorTicks);
+		}
+
+		if (this.rayos.largo() > 0) {
+			this.moverRayos();
+		}
+
 		if (this.barbariana.getSaltando()) {
 			this.barbariana.procesarSalto(this.contadorTicks);
 		}
@@ -96,7 +120,6 @@ public class Juego extends InterfaceJuego {
 			yPiso = yPiso - 110;
 			xPiso = xPiso == this.width ? 0 : this.width;
 			anchoPiso = (this.width - 150) * 2;
-			System.out.println(p.posicionSuperior());
 		}
 		this.pisos = pisosList;
 	}
@@ -141,6 +164,10 @@ public class Juego extends InterfaceJuego {
 
 	public int getContadorTicks() {
 		return this.contadorTicks;
+	}
+
+	private void moverRayos() {
+		this.rayos.forEachNodo(this.moverRayo);
 	}
 
 	@SuppressWarnings("unused")
