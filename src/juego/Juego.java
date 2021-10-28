@@ -88,9 +88,9 @@ public class Juego extends InterfaceJuego {
 			if (this.dinos[i] != null)
 				this.dinos[i].dibujarse(this.entorno);
 			if (!this.dinos[i].colisionPiso(this.pisos))
-				//this.dinos[i].gravedad();
-				
-				this.dinos[i].avanzar();
+				this.dinos[i].gravedad(this);
+
+			this.dinos[i].avanzar();
 		}
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA)) {

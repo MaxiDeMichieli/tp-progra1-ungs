@@ -15,7 +15,7 @@ public class Velocirraptor {
 
 	public Velocirraptor() {
 		this.x = 770;
-		this.y = 60;
+		this.y = 75;
 		this.ancho = 30;
 		this.alto = 60;
 		this.velocidad = 2;
@@ -31,7 +31,7 @@ public class Velocirraptor {
 			return;
 		this.y += 2.5;
 	}
-
+	
 	public void cambioDireccion() {
 		if (this.direccion.equals(Direccion.IZQUIERDA))
 			this.direccion = Direccion.DERECHA;
@@ -48,10 +48,6 @@ public class Velocirraptor {
 			this.x+=velocidad;
 			if (this.x==790)
 				this.direccion = Direccion.IZQUIERDA;
-	}
-
-	public void gravedad() {
-		this.y += 2.5;
 	}
 
 	public boolean colisionPiso(Piso[] pisos) {
