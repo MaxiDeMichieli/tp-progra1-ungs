@@ -28,6 +28,10 @@ public class Rayo {
 			this.x -= 5;
 		}
 	}
+	
+	public boolean estaTocando(int x, int y) {
+		return this.x <= x && this.y == y;
+	}
 
 	public boolean estaEnPantalla(Entorno entorno) {
 		return this.posicionExtremoDerecho() > 0 && this.posicionExtremoIzquierdo() < entorno.ancho();

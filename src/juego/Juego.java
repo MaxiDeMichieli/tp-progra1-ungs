@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
 import java.util.function.Function;
-
+import entorno.Herramientas;
 import entorno.Entorno;
 import entorno.InterfaceJuego;
 import utils.Lista;
@@ -16,6 +16,7 @@ public class Juego extends InterfaceJuego {
 	private Personaje barbariana;
 	private Computadora computadora;
 	private Velocirraptor[] dinos;
+	private Image avatar;
 
 	// Ancho y alto del juego;
 	private int height;
@@ -57,11 +58,13 @@ public class Juego extends InterfaceJuego {
 		// Inicializa dinos
 		this.dinos = new Velocirraptor[5];
 
+		this.avatar = Herramientas.cargarImagen("barbariana.jpeg");
+
 		for (int i = 0; i < dinos.length; i++) {
 			this.dinos[i] = new Velocirraptor();
 		}
-		
-		//Crea la computadora
+
+		// Crea la computadora
 		this.computadora = new Computadora(this.entorno);
 
 		// crea los pisos con sus respectivas ubicaciones
@@ -86,8 +89,9 @@ public class Juego extends InterfaceJuego {
 
 		// dibuja dinos
 		this._dibujarDinos();
-		
-		//metodo que maneja las acciones de acuerdo a la tecla que se presione en el momento
+
+		// metodo que maneja las acciones de acuerdo a la tecla que se presione en el
+		// momento
 		this._actualizarMovimientos();
 
 		if (this.rayos.largo() > 0) {
@@ -105,19 +109,21 @@ public class Juego extends InterfaceJuego {
 		entorno.cambiarFont(Font.SANS_SERIF, 25, Color.RED);
 		entorno.escribirTexto("Enemigos Eliminados: " + this.puntos, 15, 25);
 		entorno.escribirTexto("Vidas: " + this.vidas, 80, 585);
-		
+		entorno.dibujarRectangulo(40, 570, 50, 50, 0, Color.RED);
+		entorno.dibujarImagen(avatar, 40, 570, 0, 0.2);
+
 		this.contadorTicks += 1;
 	}
-	
+
 	/**
 	 * De acuerdo a una tecla presioanda, ejecuta si accion correspondiente
 	 */
 	private void _actualizarMovimientos() {
 		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA)) {
-			
-			//chequea que barbariana no llegue a la computadora. 
-			//Si llega, termina el juego y gana
-			if(this.computadora.estaTocando(this.barbariana.getX(), this.barbariana.getY())) {
+
+			// chequea que barbariana no llegue a la computadora.
+			// Si llega, termina el juego y gana
+			if (this.computadora.estaTocando(this.barbariana.getX(), this.barbariana.getY())) {
 				System.out.print("Ganaste!");
 				System.exit(0);
 			}
@@ -127,7 +133,7 @@ public class Juego extends InterfaceJuego {
 		if (this.entorno.estaPresionada(this.entorno.TECLA_IZQUIERDA)) {
 			this.barbariana.moverIzquierda(this);
 		}
-		// si presiono flecha arriba y salta
+		// si presiono flecha arriba salta
 		if (this.entorno.estaPresionada(this.entorno.TECLA_ARRIBA) && this.barbariana.colisionPiso(this.pisos)) {
 			this.barbariana.saltar(this);
 		}
@@ -162,15 +168,19 @@ public class Juego extends InterfaceJuego {
 		}
 		this.pisos = pisosList;
 	}
-	
+
 	private void _dibujarDinos() {
 		for (int i = 0; i < this.dinos.length; i++) {
 			if (this.dinos[i] != null)
 				this.dinos[i].dibujarse(this.entorno);
+
 			if (!this.dinos[i].colisionPiso(this.pisos))
 				this.dinos[i].gravedad(this);
 
 			this.dinos[i].avanzar();
+
+			if (this.dinos[i].getX() <= 25 && this.dinos[i].getY() >= 500)
+				this.dinos[i] = null;
 		}
 	}
 

@@ -1,10 +1,11 @@
 package juego;
 
 import java.awt.Color;
-
+import java.awt.Image;
 import entorno.Entorno;
 import utils.Direccion;
 import utils.Lista;
+import entorno.Herramientas;
 
 public class Personaje {
 	private String name;
