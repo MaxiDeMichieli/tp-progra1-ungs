@@ -1,9 +1,11 @@
 package juego;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.util.Random;
 
 import entorno.Entorno;
+import entorno.Herramientas;
 import utils.Direccion;
 import utils.Lista;
 
@@ -12,6 +14,7 @@ public class Velocirraptor {
 	private int ancho, alto;
 	private int velocidad;
 	private Direccion direccion;
+	private Image avatar;
 
 	public Velocirraptor() {
 		this.x = 770;
@@ -20,10 +23,12 @@ public class Velocirraptor {
 		this.alto = 60;
 		this.velocidad = 2;
 		this.direccion = Direccion.IZQUIERDA;
+		this.avatar = Herramientas.cargarImagen("velociraptor.jpg");
 	}
 
 	public void dibujarse(Entorno entorno) {
-		entorno.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.red);
+		entorno.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.BLACK);
+		entorno.dibujarImagen(this.avatar, this.x, this.y, 0, 0.2);
 	}
 
 	public void gravedad(Juego j) {

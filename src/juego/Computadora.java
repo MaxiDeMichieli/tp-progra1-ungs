@@ -1,12 +1,14 @@
 package juego;
 
 import java.awt.Color;
+import java.awt.Image;
 
 import entorno.Entorno;
+import entorno.Herramientas;
 
 public class Computadora {
 	private int x,y,ancho,alto;
-	
+	private Image avatar;
 	/**
 	 * Por default se ubica a la computadora arriba a la derecha
 	 */
@@ -15,10 +17,12 @@ public class Computadora {
 		this.y = 75;
 		this.ancho = 50;
 		this.alto = 50;
+		this.avatar = Herramientas.cargarImagen("computadora.jpg");
 	}
 	
 	public void dibujarse(Entorno e) {
-		e.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.BLUE);
+		e.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.BLACK);
+		e.dibujarImagen(this.avatar, this.x, this.y, 0, 0.2);
 	}
 	
 	/**

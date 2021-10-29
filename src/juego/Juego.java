@@ -16,7 +16,7 @@ public class Juego extends InterfaceJuego {
 	private Personaje barbariana;
 	private Computadora computadora;
 	private Velocirraptor[] dinos;
-	private Image avatar;
+	private Image avatarVida;
 
 	// Ancho y alto del juego;
 	private int height;
@@ -58,7 +58,7 @@ public class Juego extends InterfaceJuego {
 		// Inicializa dinos
 		this.dinos = new Velocirraptor[5];
 
-		this.avatar = Herramientas.cargarImagen("barbariana.jpeg");
+		this.avatarVida = Herramientas.cargarImagen("vida.png");
 
 		for (int i = 0; i < dinos.length; i++) {
 			this.dinos[i] = new Velocirraptor();
@@ -114,7 +114,7 @@ public class Juego extends InterfaceJuego {
 		entorno.escribirTexto("Enemigos Eliminados: " + this.puntos, 15, 25);
 		entorno.escribirTexto("Vidas: " + this.vidas, 80, 585);
 		entorno.dibujarRectangulo(40, 570, 50, 50, 0, Color.RED);
-		entorno.dibujarImagen(avatar, 40, 570, 0, 0.2);
+		entorno.dibujarImagen(this.avatarVida, 40, 570, 0, 0.2);
 
 		this.contadorTicks += 1;
 	}

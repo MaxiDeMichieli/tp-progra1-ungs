@@ -15,6 +15,7 @@ public class Personaje {
 	private int ultimoSalto;
 	private Direccion direccion;
 	private int ultimoDisparo;
+	private Image avatar;
 
 	Personaje(String name) {
 		this.x = 50;
@@ -24,6 +25,7 @@ public class Personaje {
 		this.altoInicial = 60;
 		this.name = name;
 		this.direccion = Direccion.DERECHA;
+		this.avatar = Herramientas.cargarImagen("barbariana.jpeg");
 	}
 
 	public void moverIzquierda(Juego j) {
@@ -70,7 +72,8 @@ public class Personaje {
 	}
 
 	public void dibujarse(Entorno e) {
-		e.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.GREEN);
+		e.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.BLACK);
+		e.dibujarImagen(this.avatar, this.x, this.y, 0, 0.2);
 	}
 
 	public void disparar(Lista<Rayo> rayos, int contadorTicks) {
