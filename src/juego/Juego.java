@@ -60,7 +60,8 @@ public class Juego extends InterfaceJuego {
 		for (int i = 0; i < dinos.length; i++) {
 			this.dinos[i] = new Velocirraptor();
 		}
-
+		
+		//Crea la computadora
 		this.computadora = new Computadora(this.entorno);
 
 		// crea los pisos con sus respectivas ubicaciones
@@ -84,21 +85,41 @@ public class Juego extends InterfaceJuego {
 		this.computadora.dibujarse(this.entorno);
 
 		// dibuja dinos
-		for (int i = 0; i < dinos.length; i++) {
-			if (this.dinos[i] != null)
-				this.dinos[i].dibujarse(this.entorno);
-			if (!this.dinos[i].colisionPiso(this.pisos))
-				this.dinos[i].gravedad(this);
+		this._dibujarDinos();
+		
+		//metodo que maneja las acciones de acuerdo a la tecla que se presione en el momento
+		this._actualizarMovimientos();
 
-			this.dinos[i].avanzar();
+		if (this.rayos.largo() > 0) {
+			this.moverRayos();
 		}
 
+		if (this.barbariana.getSaltando()) {
+			this.barbariana.procesarSalto(this.contadorTicks);
+		}
+
+		if (!this.barbariana.colisionPiso(this.pisos) && !this.barbariana.getSaltando()) {
+			this.barbariana.gravedad(this);
+		}
+
+		entorno.cambiarFont(Font.SANS_SERIF, 25, Color.RED);
+		entorno.escribirTexto("Enemigos Eliminados: " + this.puntos, 15, 25);
+		entorno.escribirTexto("Vidas: " + this.vidas, 80, 585);
+		
+		this.contadorTicks += 1;
+	}
+	
+	/**
+	 * De acuerdo a una tecla presioanda, ejecuta si accion correspondiente
+	 */
+	private void _actualizarMovimientos() {
 		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA)) {
 			
-			//chequea que barbariana no llegue a la computadora. Si llega, termina el juego y gana
+			//chequea que barbariana no llegue a la computadora. 
+			//Si llega, termina el juego y gana
 			if(this.computadora.estaTocando(this.barbariana.getX(), this.barbariana.getY())) {
-				System.out.print("Gano");
-				return;
+				System.out.print("Ganaste!");
+				System.exit(0);
 			}
 			this.barbariana.moverDerecha(this);
 		}
@@ -125,24 +146,6 @@ public class Juego extends InterfaceJuego {
 				&& this.barbariana.getUltimoDisparo() + 50 <= this.contadorTicks) {
 			this.barbariana.disparar(this.rayos, this.contadorTicks);
 		}
-
-		if (this.rayos.largo() > 0) {
-			this.moverRayos();
-		}
-
-		if (this.barbariana.getSaltando()) {
-			this.barbariana.procesarSalto(this.contadorTicks);
-		}
-
-		if (!this.barbariana.colisionPiso(this.pisos) && !this.barbariana.getSaltando()) {
-			this.barbariana.gravedad(this);
-		}
-
-		entorno.cambiarFont(Font.SANS_SERIF, 25, Color.RED);
-		entorno.escribirTexto("Enemigos Eliminados: " + this.puntos, 15, 25);
-		entorno.escribirTexto("Vidas: " + this.vidas, 80, 585);
-		
-		this.contadorTicks += 1;
 	}
 
 	private void _inicializarPisos() {
@@ -158,6 +161,17 @@ public class Juego extends InterfaceJuego {
 			anchoPiso = (this.width - 150) * 2;
 		}
 		this.pisos = pisosList;
+	}
+	
+	private void _dibujarDinos() {
+		for (int i = 0; i < this.dinos.length; i++) {
+			if (this.dinos[i] != null)
+				this.dinos[i].dibujarse(this.entorno);
+			if (!this.dinos[i].colisionPiso(this.pisos))
+				this.dinos[i].gravedad(this);
+
+			this.dinos[i].avanzar();
+		}
 	}
 
 	private void _dibujarPisos() {
