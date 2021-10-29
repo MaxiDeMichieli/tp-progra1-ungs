@@ -89,6 +89,10 @@ public class Juego extends InterfaceJuego {
 
 		// dibuja dinos
 		this._dibujarDinos();
+		
+		// Se verifica el impacto del dino no solo cuando se mueve a un lado, sino tambien
+		// cuando esta quieto el personaje.
+		this._verificarImpactoAPersonaje();
 
 		// metodo que maneja las acciones de acuerdo a la tecla que se presione en el
 		// momento
@@ -120,7 +124,10 @@ public class Juego extends InterfaceJuego {
 	 */
 	private void _actualizarMovimientos() {
 		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA)) {
-
+			
+			//antes de mover a la derecha, chequea que no sea impactada por un velocirraptor..
+			this._verificarImpactoAPersonaje();
+			
 			// chequea que barbariana no llegue a la computadora.
 			// Si llega, termina el juego y gana
 			if (this.computadora.estaTocando(this.barbariana.getX(), this.barbariana.getY())) {
@@ -131,6 +138,9 @@ public class Juego extends InterfaceJuego {
 		}
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_IZQUIERDA)) {
+			//antes de mover a la izquierda, chequea que no sea impactada por un velocirraptor..
+			this._verificarImpactoAPersonaje();
+			
 			this.barbariana.moverIzquierda(this);
 		}
 		// si presiono flecha arriba salta
@@ -176,20 +186,27 @@ public class Juego extends InterfaceJuego {
 
 			if (!this.dinos[i].colisionPiso(this.pisos))
 				this.dinos[i].gravedad(this);
+			
 
 			this.dinos[i].avanzar();
-
+			
 			if (this.dinos[i].getX() <= 25 && this.dinos[i].getY() >= 500)
 				this.dinos[i] = null;
 		}
 	}
-
+	
 	private void _dibujarPisos() {
 		for (Piso piso : this.pisos) {
 			piso.dibujarse(this.entorno);
 		}
 	}
-
+	
+	private void _verificarImpactoAPersonaje() {
+		if(this.barbariana.esImpactado(this.dinos)) {
+			System.exit(0);
+		};
+	}
+	
 	public Piso[] getPisos() {
 		return pisos;
 	}

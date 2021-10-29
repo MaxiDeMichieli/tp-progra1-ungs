@@ -166,6 +166,27 @@ public class Personaje {
 	public int posicionPies() {
 		return this.y + this.alto / 2;
 	}
+	
+	/**
+	 * Recibe los velociraptors y chequea si alguno impacto a barbariana
+	 * @param dinos
+	 * @return boolean
+	 */
+	public boolean esImpactado(Velocirraptor[] dinos) {
+		
+		// Seteo un rango de posibilidades para verificar si la x del dino esta dentro de ese rango
+		// Esta solución s eimplemento porque a veces al acutalizar las posiciones tanto de los dinos
+		// como del personaje.. no coincidian por un valor.
+		int minX = this.x;
+		int maxX = this.x + 5;
+		
+		for(Velocirraptor dino : dinos) {
+			if(dino.getX() <= maxX && dino.getX() >= minX && dino.getY() == this.y) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public String getName() {
 		return name;
