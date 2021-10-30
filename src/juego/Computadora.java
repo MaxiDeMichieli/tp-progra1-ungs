@@ -17,12 +17,12 @@ public class Computadora {
 		this.y = 75;
 		this.ancho = 50;
 		this.alto = 50;
-		this.avatar = Herramientas.cargarImagen("computadora.jpg");
+		this.avatar = Herramientas.cargarImagen("PC.png");
 	}
 	
 	public void dibujarse(Entorno e) {
 		e.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.BLACK);
-		e.dibujarImagen(this.avatar, this.x, this.y, 0, 0.2);
+		e.dibujarImagen(this.avatar, this.x, this.y, 0, 1);
 	}
 	
 	/**

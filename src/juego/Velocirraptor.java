@@ -14,7 +14,8 @@ public class Velocirraptor {
 	private int ancho, alto;
 	private int velocidad;
 	private Direccion direccion;
-	private Image avatar;
+	private Image avatarIzq;
+	private Image avatarDer;
 
 	public Velocirraptor() {
 		this.x = 770;
@@ -23,12 +24,16 @@ public class Velocirraptor {
 		this.alto = 60;
 		this.velocidad = 2;
 		this.direccion = Direccion.IZQUIERDA;
-		this.avatar = Herramientas.cargarImagen("velociraptor.jpg");
+		this.avatarDer = Herramientas.cargarImagen("Dino.png");
+		this.avatarIzq = Herramientas.cargarImagen("DinoIzq.png");
 	}
 
 	public void dibujarse(Entorno entorno) {
 		entorno.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.BLACK);
-		entorno.dibujarImagen(this.avatar, this.x, this.y, 0, 0.2);
+		if (this.direccion.equals(Direccion.IZQUIERDA))
+			entorno.dibujarImagen(this.avatarIzq, this.x, this.y, 0, 1);
+		if (this.direccion.equals(Direccion.DERECHA))
+			entorno.dibujarImagen(this.avatarDer, this.x, this.y, 0, 1);		
 	}
 
 	public void gravedad(Juego j) {
