@@ -15,7 +15,7 @@ public class Lista<T> {
 		Nodo<T> actual = this.primero;
 		System.out.print("[");
 		while (actual != null) {
-			System.out.print(actual.elemento + " ");
+			System.out.print(actual.id + " ");
 			actual = actual.siguiente;
 		}
 		System.out.println("]");
@@ -80,7 +80,7 @@ public class Lista<T> {
 			this.primero = this.primero.siguiente;
 		}
 		while (actual != null && actual.siguiente != null) {
-			if (actual.id == id) {
+			if (actual.siguiente.id == id) {
 				actual.siguiente = actual.siguiente.siguiente;
 				return;
 			}

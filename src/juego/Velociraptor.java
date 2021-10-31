@@ -2,14 +2,12 @@ package juego;
 
 import java.awt.Color;
 import java.awt.Image;
-import java.util.Random;
 
 import entorno.Entorno;
 import entorno.Herramientas;
 import utils.Direccion;
-import utils.Lista;
 
-public class Velocirraptor {
+public class Velociraptor {
 	private int x, y;
 	private int ancho, alto;
 	private int velocidad;
@@ -17,7 +15,7 @@ public class Velocirraptor {
 	private Image avatarIzq;
 	private Image avatarDer;
 
-	public Velocirraptor() {
+	public Velociraptor() {
 		this.x = 770;
 		this.y = 75;
 		this.ancho = 30;
@@ -33,7 +31,7 @@ public class Velocirraptor {
 		if (this.direccion.equals(Direccion.IZQUIERDA))
 			entorno.dibujarImagen(this.avatarIzq, this.x, this.y, 0, 1);
 		if (this.direccion.equals(Direccion.DERECHA))
-			entorno.dibujarImagen(this.avatarDer, this.x, this.y, 0, 1);		
+			entorno.dibujarImagen(this.avatarDer, this.x, this.y, 0, 1);
 	}
 
 	public void gravedad(Juego j) {
@@ -42,10 +40,11 @@ public class Velocirraptor {
 		this.y += 2.5;
 	}
 
-	public void avanzar() {
-		if (this.x >= 20 && this.direccion.equals(Direccion.IZQUIERDA))
+	public void avanzar(Piso[] pisos) {
+		int pisoActual = this.pisoActual(pisos);
+		if ((this.x >= 20 || pisoActual == 0) && this.direccion.equals(Direccion.IZQUIERDA))
 			this.x -= velocidad;
-		if (this.x == 20)
+		if (this.x == 20 && pisoActual != 0)
 			this.direccion = Direccion.DERECHA;
 		if (this.x <= 790 && this.direccion.equals(Direccion.DERECHA))
 			this.x += velocidad;
@@ -60,6 +59,30 @@ public class Velocirraptor {
 					&& this.posicionExtremoDerecho() >= piso.posicionExtremoIzquierdo()) {
 				return true;
 			}
+		}
+		return false;
+	}
+
+	public int pisoActual(Piso[] pisos) {
+		for (Piso piso : pisos) {
+			if (piso.posicionSuperior() == this.posicionPies()
+					&& this.posicionExtremoIzquierdo() <= piso.posicionExtremoDerecho()
+					&& this.posicionExtremoDerecho() >= piso.posicionExtremoIzquierdo()) {
+				return piso.getNumero();
+			}
+		}
+		return -1;
+	}
+
+	public boolean estaEnPantalla(Entorno entorno) {
+		return this.posicionExtremoDerecho() > 0 && this.posicionExtremoIzquierdo() < entorno.ancho();
+	}
+
+	public boolean esImpactado(int xIzq, int xDer, int yArr, int yAba) {
+		boolean tocandoX = xIzq < this.posicionExtremoDerecho() && this.posicionExtremoIzquierdo() < xDer;
+		boolean tocandoY = yAba > this.posicionCabeza() && this.posicionPies() > yArr;
+		if (tocandoX && tocandoY) {
+			return true;
 		}
 		return false;
 	}

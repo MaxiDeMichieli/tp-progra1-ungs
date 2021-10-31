@@ -76,8 +76,8 @@ public class Personaje {
 		e.dibujarImagen(this.avatar, this.x, this.y, 0, 0.2);
 	}
 
-	public void disparar(Lista<Rayo> rayos, int contadorTicks) {
-		rayos.agregarAtras(new Rayo(this.x, this.y, this.direccion));
+	public void disparar(Lista<Proyectil> rayos, int contadorTicks) {
+		rayos.agregarAtras(new Proyectil(this.x, this.y, this.direccion));
 		this.ultimoDisparo = contadorTicks;
 	}
 
@@ -154,6 +154,15 @@ public class Personaje {
 		}
 	}
 
+	public boolean esImpactado(int xIzq, int xDer, int yArr, int yAba) {
+		boolean tocandoX = xIzq < this.posicionExtremoDerecho() && this.posicionExtremoIzquierdo() < xDer;
+		boolean tocandoY = yAba > this.posicionCabeza() && this.posicionPies() > yArr;
+		if (tocandoX && tocandoY) {
+			return true;
+		}
+		return false;
+	}
+
 	public int posicionExtremoDerecho() {
 		return this.x + this.ancho / 2;
 	}
@@ -168,27 +177,6 @@ public class Personaje {
 
 	public int posicionPies() {
 		return this.y + this.alto / 2;
-	}
-	
-	/**
-	 * Recibe los velociraptors y chequea si alguno impacto a barbariana
-	 * @param dinos
-	 * @return boolean
-	 */
-	public boolean esImpactado(Velocirraptor[] dinos) {
-		
-		// Seteo un rango de posibilidades para verificar si la x del dino esta dentro de ese rango
-		// Esta solución s eimplemento porque a veces al acutalizar las posiciones tanto de los dinos
-		// como del personaje.. no coincidian por un valor.
-		int minX = this.x;
-		int maxX = this.x + 5;
-		
-		for(Velocirraptor dino : dinos) {
-			if(dino.getX() <= maxX && dino.getX() >= minX && dino.getY() == this.y) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	public String getName() {

@@ -15,7 +15,6 @@ public class Juego extends InterfaceJuego {
 	private Entorno entorno;
 	private Personaje barbariana;
 	private Computadora computadora;
-	private Velocirraptor[] dinos;
 	private Image avatarVida;
 
 	// Ancho y alto del juego;
@@ -30,13 +29,18 @@ public class Juego extends InterfaceJuego {
 	private int puntos;
 	private int vidas = 3;
 
-	private Lista<Rayo> rayos;
-	private Function<Nodo<Rayo>, Void> moverRayo = rayo -> {
-		rayo.getElemento().moverse();
-		rayo.getElemento().dibujarse(this.entorno);
-		if (!rayo.getElemento().estaEnPantalla(this.entorno)) {
-			rayos.quitarPorId(rayo.getId());
-		}
+	private Lista<Proyectil> rayos;
+	private Function<Nodo<Proyectil>, Void> moverRayoFunc = rayo -> {
+		this.moverRayo(rayo);
+		return null;
+	};
+
+	private int tickUltimoDino;
+	private Lista<Velociraptor> dinos;
+	private Function<Nodo<Velociraptor>, Void> procesarDinoFunc = dino -> {
+		this.moverDino(dino);
+		this.verificarImpactoADino(dino);
+		this.dinos.mostrar();
 		return null;
 	};
 
@@ -53,16 +57,13 @@ public class Juego extends InterfaceJuego {
 
 		// Inicializa el personaje
 		this.barbariana = new Personaje("Barbariana");
-		this.rayos = new Lista<Rayo>();
-
-		// Inicializa dinos
-		this.dinos = new Velocirraptor[5];
+		this.rayos = new Lista<Proyectil>();
 
 		this.avatarVida = Herramientas.cargarImagen("vida.png");
 
-		for (int i = 0; i < dinos.length; i++) {
-			this.dinos[i] = new Velocirraptor();
-		}
+		// Inicializa dinos
+		this.dinos = new Lista<Velociraptor>();
+		this.tickUltimoDino = -1;
 
 		// Crea la computadora
 		this.computadora = new Computadora(this.entorno);
@@ -89,8 +90,9 @@ public class Juego extends InterfaceJuego {
 
 		// dibuja dinos
 		this._dibujarDinos();
-		
-		// Se verifica el impacto del dino no solo cuando se mueve a un lado, sino tambien
+
+		// Se verifica el impacto del dino no solo cuando se mueve a un lado, sino
+		// tambien
 		// cuando esta quieto el personaje.
 		this._verificarImpactoAPersonaje();
 
@@ -124,10 +126,6 @@ public class Juego extends InterfaceJuego {
 	 */
 	private void _actualizarMovimientos() {
 		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA)) {
-			
-			//antes de mover a la derecha, chequea que no sea impactada por un velocirraptor..
-			this._verificarImpactoAPersonaje();
-			
 			// chequea que barbariana no llegue a la computadora.
 			// Si llega, termina el juego y gana
 			if (this.computadora.estaTocando(this.barbariana.getX(), this.barbariana.getY())) {
@@ -138,9 +136,6 @@ public class Juego extends InterfaceJuego {
 		}
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_IZQUIERDA)) {
-			//antes de mover a la izquierda, chequea que no sea impactada por un velocirraptor..
-			this._verificarImpactoAPersonaje();
-			
 			this.barbariana.moverIzquierda(this);
 		}
 		// si presiono flecha arriba salta
@@ -180,33 +175,45 @@ public class Juego extends InterfaceJuego {
 	}
 
 	private void _dibujarDinos() {
-		for (int i = 0; i < this.dinos.length; i++) {
-			if (this.dinos[i] != null)
-				this.dinos[i].dibujarse(this.entorno);
-
-			if (!this.dinos[i].colisionPiso(this.pisos))
-				this.dinos[i].gravedad(this);
-			
-
-			this.dinos[i].avanzar();
-			
-			if (this.dinos[i].getX() <= 25 && this.dinos[i].getY() >= 500)
-				this.dinos[i] = null;
+		if (this.tickUltimoDino == -1 || (this.dinos.largo() <= 6 && this.tickUltimoDino + 300 < this.contadorTicks)) {
+			this.dinos.agregarAtras(new Velociraptor());
+			this.tickUltimoDino = this.contadorTicks;
 		}
+		this.procesarDinos();
 	}
-	
+
 	private void _dibujarPisos() {
 		for (Piso piso : this.pisos) {
 			piso.dibujarse(this.entorno);
 		}
 	}
-	
-	private void _verificarImpactoAPersonaje() {
-		if(this.barbariana.esImpactado(this.dinos)) {
+
+	private Function<Velociraptor, Void> verificarImpactoAPersonajeFunc = dino -> {
+		if (this.barbariana.esImpactado(dino.posicionExtremoIzquierdo(), dino.posicionExtremoDerecho(),
+				dino.posicionCabeza(), dino.posicionPies())) {
 			System.exit(0);
-		};
+		}
+		return null;
+	};
+
+	private void _verificarImpactoAPersonaje() {
+		this.dinos.forEachElement(this.verificarImpactoAPersonajeFunc);
 	}
-	
+
+	private void verificarImpactoADino(Nodo<Velociraptor> dino) {
+		Function<Nodo<Proyectil>, Void> verificarImpactoARayosFunc = nodoRayo -> {
+			Proyectil rayo = nodoRayo.getElemento();
+			if (dino.getElemento().esImpactado(rayo.posicionExtremoIzquierdo(), rayo.posicionExtremoDerecho(),
+					rayo.posicionYArriba(), rayo.posicionYAbajo())) {
+				this.dinos.quitarPorId(dino.getId());
+				this.rayos.quitarPorId(nodoRayo.getId());
+				this.puntos += 1;
+			}
+			return null;
+		};
+		this.rayos.forEachNodo(verificarImpactoARayosFunc);
+	}
+
 	public Piso[] getPisos() {
 		return pisos;
 	}
@@ -243,8 +250,30 @@ public class Juego extends InterfaceJuego {
 		return this.contadorTicks;
 	}
 
+	private void moverRayo(Nodo<Proyectil> rayo) {
+		rayo.getElemento().moverse();
+		rayo.getElemento().dibujarse(this.entorno);
+		if (!rayo.getElemento().estaEnPantalla(this.entorno)) {
+			rayos.quitarPorId(rayo.getId());
+		}
+	}
+
 	private void moverRayos() {
-		this.rayos.forEachNodo(this.moverRayo);
+		this.rayos.forEachNodo(this.moverRayoFunc);
+	}
+
+	private void moverDino(Nodo<Velociraptor> dino) {
+		if (!dino.getElemento().colisionPiso(this.pisos))
+			dino.getElemento().gravedad(this);
+		dino.getElemento().avanzar(this.pisos);
+		dino.getElemento().dibujarse(this.entorno);
+		if (!dino.getElemento().estaEnPantalla(this.entorno)) {
+			dinos.quitarPorId(dino.getId());
+		}
+	}
+
+	private void procesarDinos() {
+		this.dinos.forEachNodo(this.procesarDinoFunc);
 	}
 
 	@SuppressWarnings("unused")
