@@ -56,7 +56,8 @@ public class Velociraptor {
 
 	public void disparar(Lista<Proyectil> lasers, int contadorTicks) {
 		if (this.proximoDisparo < contadorTicks) {
-			lasers.agregarAtras(new Proyectil(this.x, this.y - 10, this.direccion, Color.RED));
+			if (this.proximoDisparo != 0)
+				lasers.agregarAtras(new Proyectil(this.x, this.y - 10, this.direccion, Color.RED));
 			this.proximoDisparo = contadorTicks + (int) Math.floor(Math.random() * (250 - 150 + 1) + 150);
 		}
 	}
