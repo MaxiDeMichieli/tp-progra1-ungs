@@ -28,6 +28,10 @@ public class Juego extends InterfaceJuego {
 
 	private int puntos;
 	private int vidas = 3;
+	
+	// 1 = Gano
+	// 0 = Perdio
+	private int estadoJuego = -1;
 
 	private Lista<Proyectil> rayos;
 	private Function<Nodo<Proyectil>, Void> procesarRayoFunc = rayo -> {
@@ -96,9 +100,15 @@ public class Juego extends InterfaceJuego {
 
 		// dibuja computadora
 		this.computadora.dibujarse(this.entorno);
+		
+		if(this.estadoJuego == 1) {
+			this.finDelJuego("Ganaste!", Color.GREEN);
+		}else if(this.estadoJuego == 0) {
+			this.finDelJuego("Perdiste", Color.RED);
+		}
 
 		// dibuja dinos
-		this._dibujarDinos();
+		this._dibujarDinos(); 
 
 		// Se verifica el impacto del dino no solo cuando se mueve a un lado, sino
 		// tambien
@@ -142,8 +152,7 @@ public class Juego extends InterfaceJuego {
 			// chequea que barbariana no llegue a la computadora.
 			// Si llega, termina el juego y gana
 			if (this.computadora.estaTocando(this.barbariana.getX(), this.barbariana.getY())) {
-				System.out.print("Ganaste!");
-				System.exit(0);
+				this.estadoJuego = 1; 
 			}
 			this.barbariana.moverDerecha(this);
 		}
@@ -204,7 +213,7 @@ public class Juego extends InterfaceJuego {
 	private Function<Velociraptor, Void> verificarImpactoDinoAPersonajeFunc = dino -> {
 		if (this.barbariana.esImpactado(dino.posicionExtremoIzquierdo(), dino.posicionExtremoDerecho(),
 				dino.posicionCabeza(), dino.posicionPies())) {
-			System.exit(0);
+			this.estadoJuego = 0;
 		}
 		return null;
 	};
@@ -216,7 +225,7 @@ public class Juego extends InterfaceJuego {
 	private void _verificarImpactoLaserAPersonaje(Proyectil laser) {
 		if (this.barbariana.esImpactado(laser.posicionExtremoIzquierdo(), laser.posicionExtremoDerecho(),
 				laser.posicionYArriba(), laser.posicionYAbajo()))
-			System.exit(0);
+			this.estadoJuego = 0;
 	}
 
 	private void verificarImpactoADino(Nodo<Velociraptor> dino) {
@@ -245,43 +254,7 @@ public class Juego extends InterfaceJuego {
 		};
 		this.lasers.forEachNodo(verificarImpactoARayosFunc);
 	}
-
-	public Piso[] getPisos() {
-		return pisos;
-	}
-
-	public void setPisos(Piso[] pisos) {
-		this.pisos = pisos;
-	}
-
-	public int getCantPisos() {
-		return cantPisos;
-	}
-
-	public void setCantPisos(int cantPisos) {
-		this.cantPisos = cantPisos;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public void setHeigth(int height) {
-		this.height = height;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	public int getContadorTicks() {
-		return this.contadorTicks;
-	}
-
+	
 	private void moverRayo(Nodo<Proyectil> rayo) {
 		rayo.getElemento().moverse();
 		rayo.getElemento().dibujarse(this.entorno);
@@ -318,6 +291,186 @@ public class Juego extends InterfaceJuego {
 
 	private void procesarDinos() {
 		this.dinos.forEachNodo(this.procesarDinoFunc);
+	}
+	
+	/**
+	 * Ejecuta mensaje en pantalla y finaliza la ejecución.
+	 */
+	private void finDelJuego(String message, Color color) {
+		entorno.cambiarFont(Font.SANS_SERIF, 30, color);
+		entorno.escribirTexto(message, this.width / 2, 40);
+		
+		//ejecuta una funcion despues de determinado tiempo en ms (milisegundos)
+		new java.util.Timer().schedule( 
+			new java.util.TimerTask() { 
+				public void run() { 
+					System.exit(0);
+				}
+			},500 
+		);
+	}
+	
+	
+	//Getter and setters
+
+	public Entorno getEntorno() {
+		return entorno;
+	}
+
+	public void setEntorno(Entorno entorno) {
+		this.entorno = entorno;
+	}
+
+	public Personaje getBarbariana() {
+		return barbariana;
+	}
+
+	public void setBarbariana(Personaje barbariana) {
+		this.barbariana = barbariana;
+	}
+
+	public Computadora getComputadora() {
+		return computadora;
+	}
+
+	public void setComputadora(Computadora computadora) {
+		this.computadora = computadora;
+	}
+
+	public Image getAvatarVida() {
+		return avatarVida;
+	}
+
+	public void setAvatarVida(Image avatarVida) {
+		this.avatarVida = avatarVida;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getCantPisos() {
+		return cantPisos;
+	}
+
+	public void setCantPisos(int cantPisos) {
+		this.cantPisos = cantPisos;
+	}
+
+	public Piso[] getPisos() {
+		return pisos;
+	}
+
+	public void setPisos(Piso[] pisos) {
+		this.pisos = pisos;
+	}
+
+	public int getContadorTicks() {
+		return contadorTicks;
+	}
+
+	public void setContadorTicks(int contadorTicks) {
+		this.contadorTicks = contadorTicks;
+	}
+
+	public int getPuntos() {
+		return puntos;
+	}
+
+	public void setPuntos(int puntos) {
+		this.puntos = puntos;
+	}
+
+	public int getVidas() {
+		return vidas;
+	}
+
+	public void setVidas(int vidas) {
+		this.vidas = vidas;
+	}
+
+	public Lista<Proyectil> getRayos() {
+		return rayos;
+	}
+
+	public void setRayos(Lista<Proyectil> rayos) {
+		this.rayos = rayos;
+	}
+
+	public Function<Nodo<Proyectil>, Void> getProcesarRayoFunc() {
+		return procesarRayoFunc;
+	}
+
+	public void setProcesarRayoFunc(Function<Nodo<Proyectil>, Void> procesarRayoFunc) {
+		this.procesarRayoFunc = procesarRayoFunc;
+	}
+
+	public int getTickUltimoDino() {
+		return tickUltimoDino;
+	}
+
+	public void setTickUltimoDino(int tickUltimoDino) {
+		this.tickUltimoDino = tickUltimoDino;
+	}
+
+	public Lista<Velociraptor> getDinos() {
+		return dinos;
+	}
+
+	public void setDinos(Lista<Velociraptor> dinos) {
+		this.dinos = dinos;
+	}
+
+	public Function<Nodo<Velociraptor>, Void> getProcesarDinoFunc() {
+		return procesarDinoFunc;
+	}
+
+	public void setProcesarDinoFunc(Function<Nodo<Velociraptor>, Void> procesarDinoFunc) {
+		this.procesarDinoFunc = procesarDinoFunc;
+	}
+
+	public Lista<Proyectil> getLasers() {
+		return lasers;
+	}
+
+	public void setLasers(Lista<Proyectil> lasers) {
+		this.lasers = lasers;
+	}
+
+	public Function<Nodo<Proyectil>, Void> getMoverLaserFunc() {
+		return moverLaserFunc;
+	}
+
+	public void setMoverLaserFunc(Function<Nodo<Proyectil>, Void> moverLaserFunc) {
+		this.moverLaserFunc = moverLaserFunc;
+	}
+
+	public Function<Velociraptor, Void> getVerificarImpactoDinoAPersonajeFunc() {
+		return verificarImpactoDinoAPersonajeFunc;
+	}
+
+	public void setVerificarImpactoDinoAPersonajeFunc(Function<Velociraptor, Void> verificarImpactoDinoAPersonajeFunc) {
+		this.verificarImpactoDinoAPersonajeFunc = verificarImpactoDinoAPersonajeFunc;
+	}
+	
+	public int getEstadoJuego() {
+		return this.estadoJuego;
+	}
+
+	public void setEstadoJuego(int estado) {
+		this.estadoJuego = estado;
 	}
 
 	@SuppressWarnings("unused")
