@@ -6,6 +6,7 @@ import java.awt.Image;
 import entorno.Entorno;
 import entorno.Herramientas;
 import utils.Direccion;
+import utils.Lista;
 
 public class Velociraptor {
 	private int x, y;
@@ -14,6 +15,7 @@ public class Velociraptor {
 	private Direccion direccion;
 	private Image avatarIzq;
 	private Image avatarDer;
+	private int proximoDisparo;
 
 	public Velociraptor() {
 		this.x = 770;
@@ -50,6 +52,13 @@ public class Velociraptor {
 			this.x += velocidad;
 		if (this.x == 790)
 			this.direccion = Direccion.IZQUIERDA;
+	}
+
+	public void disparar(Lista<Proyectil> lasers, int contadorTicks) {
+		if (this.proximoDisparo < contadorTicks) {
+			lasers.agregarAtras(new Proyectil(this.x, this.y - 10, this.direccion, Color.RED));
+			this.proximoDisparo = contadorTicks + (int) Math.floor(Math.random() * (250 - 150 + 1) + 150);
+		}
 	}
 
 	public boolean colisionPiso(Piso[] pisos) {

@@ -77,7 +77,7 @@ public class Personaje {
 	}
 
 	public void disparar(Lista<Proyectil> rayos, int contadorTicks) {
-		rayos.agregarAtras(new Proyectil(this.x, this.y, this.direccion));
+		rayos.agregarAtras(new Proyectil(this.x, this.y - 10, this.direccion, Color.YELLOW));
 		this.ultimoDisparo = contadorTicks;
 	}
 

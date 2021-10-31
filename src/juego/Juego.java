@@ -30,8 +30,9 @@ public class Juego extends InterfaceJuego {
 	private int vidas = 3;
 
 	private Lista<Proyectil> rayos;
-	private Function<Nodo<Proyectil>, Void> moverRayoFunc = rayo -> {
+	private Function<Nodo<Proyectil>, Void> procesarRayoFunc = rayo -> {
 		this.moverRayo(rayo);
+		this.verificarImpactoALaser(rayo);
 		return null;
 	};
 
@@ -40,7 +41,14 @@ public class Juego extends InterfaceJuego {
 	private Function<Nodo<Velociraptor>, Void> procesarDinoFunc = dino -> {
 		this.moverDino(dino);
 		this.verificarImpactoADino(dino);
-		this.dinos.mostrar();
+		dino.getElemento().disparar(this.lasers, this.contadorTicks);
+		return null;
+	};
+
+	private Lista<Proyectil> lasers;
+	private Function<Nodo<Proyectil>, Void> moverLaserFunc = laser -> {
+		this.moverLaser(laser);
+		this._verificarImpactoLaserAPersonaje(laser.getElemento());
 		return null;
 	};
 
@@ -63,6 +71,7 @@ public class Juego extends InterfaceJuego {
 
 		// Inicializa dinos
 		this.dinos = new Lista<Velociraptor>();
+		this.lasers = new Lista<Proyectil>();
 		this.tickUltimoDino = -1;
 
 		// Crea la computadora
@@ -94,14 +103,18 @@ public class Juego extends InterfaceJuego {
 		// Se verifica el impacto del dino no solo cuando se mueve a un lado, sino
 		// tambien
 		// cuando esta quieto el personaje.
-		this._verificarImpactoAPersonaje();
+		this._verificarImpactoDinoAPersonaje();
 
 		// metodo que maneja las acciones de acuerdo a la tecla que se presione en el
 		// momento
 		this._actualizarMovimientos();
 
 		if (this.rayos.largo() > 0) {
-			this.moverRayos();
+			this.procesarRayos();
+		}
+
+		if (this.lasers.largo() > 0) {
+			this.moverLasers();
 		}
 
 		if (this.barbariana.getSaltando()) {
@@ -188,7 +201,7 @@ public class Juego extends InterfaceJuego {
 		}
 	}
 
-	private Function<Velociraptor, Void> verificarImpactoAPersonajeFunc = dino -> {
+	private Function<Velociraptor, Void> verificarImpactoDinoAPersonajeFunc = dino -> {
 		if (this.barbariana.esImpactado(dino.posicionExtremoIzquierdo(), dino.posicionExtremoDerecho(),
 				dino.posicionCabeza(), dino.posicionPies())) {
 			System.exit(0);
@@ -196,8 +209,14 @@ public class Juego extends InterfaceJuego {
 		return null;
 	};
 
-	private void _verificarImpactoAPersonaje() {
-		this.dinos.forEachElement(this.verificarImpactoAPersonajeFunc);
+	private void _verificarImpactoDinoAPersonaje() {
+		this.dinos.forEachElement(this.verificarImpactoDinoAPersonajeFunc);
+	}
+
+	private void _verificarImpactoLaserAPersonaje(Proyectil laser) {
+		if (this.barbariana.esImpactado(laser.posicionExtremoIzquierdo(), laser.posicionExtremoDerecho(),
+				laser.posicionYArriba(), laser.posicionYAbajo()))
+			System.exit(0);
 	}
 
 	private void verificarImpactoADino(Nodo<Velociraptor> dino) {
@@ -212,6 +231,19 @@ public class Juego extends InterfaceJuego {
 			return null;
 		};
 		this.rayos.forEachNodo(verificarImpactoARayosFunc);
+	}
+
+	private void verificarImpactoALaser(Nodo<Proyectil> rayo) {
+		Function<Nodo<Proyectil>, Void> verificarImpactoARayosFunc = nodoLaser -> {
+			Proyectil laser = nodoLaser.getElemento();
+			if (rayo.getElemento().esImpactado(laser.posicionExtremoIzquierdo(), laser.posicionExtremoDerecho(),
+					laser.posicionYArriba(), laser.posicionYAbajo())) {
+				this.lasers.quitarPorId(nodoLaser.getId());
+				this.rayos.quitarPorId(rayo.getId());
+			}
+			return null;
+		};
+		this.lasers.forEachNodo(verificarImpactoARayosFunc);
 	}
 
 	public Piso[] getPisos() {
@@ -258,8 +290,20 @@ public class Juego extends InterfaceJuego {
 		}
 	}
 
-	private void moverRayos() {
-		this.rayos.forEachNodo(this.moverRayoFunc);
+	private void moverLaser(Nodo<Proyectil> laser) {
+		laser.getElemento().moverse();
+		laser.getElemento().dibujarse(this.entorno);
+		if (!laser.getElemento().estaEnPantalla(this.entorno)) {
+			lasers.quitarPorId(laser.getId());
+		}
+	}
+
+	private void procesarRayos() {
+		this.rayos.forEachNodo(this.procesarRayoFunc);
+	}
+
+	private void moverLasers() {
+		this.lasers.forEachNodo(this.moverLaserFunc);
 	}
 
 	private void moverDino(Nodo<Velociraptor> dino) {
