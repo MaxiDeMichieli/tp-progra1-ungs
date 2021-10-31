@@ -34,28 +34,10 @@ public class Juego extends InterfaceJuego {
 	// 0 = Perdio
 	private int estadoJuego = -1;
 
-	private Lista<Proyectil> rayos;
-	private Function<Nodo<Proyectil>, Void> procesarRayoFunc = rayo -> {
-		this.moverRayo(rayo);
-		this.verificarImpactoALaser(rayo);
-		return null;
-	};
-
 	private int tickUltimoDino;
+	private Lista<Proyectil> rayos;
 	private Lista<Velociraptor> dinos;
-	private Function<Nodo<Velociraptor>, Void> procesarDinoFunc = dino -> {
-		this.moverDino(dino);
-		this.verificarImpactoADino(dino);
-		dino.getElemento().disparar(this.lasers, this.contadorTicks);
-		return null;
-	};
-
 	private Lista<Proyectil> lasers;
-	private Function<Nodo<Proyectil>, Void> moverLaserFunc = laser -> {
-		this.moverLaser(laser);
-		this._verificarImpactoLaserAPersonaje(laser.getElemento());
-		return null;
-	};
 
 	Juego() {
 
@@ -278,10 +260,22 @@ public class Juego extends InterfaceJuego {
 	private void procesarRayos() {
 		this.rayos.forEachNodo(this.procesarRayoFunc);
 	}
+	
+	private Function<Nodo<Proyectil>, Void> procesarRayoFunc = rayo -> {
+		this.moverRayo(rayo);
+		this.verificarImpactoALaser(rayo);
+		return null;
+	};
 
 	private void moverLasers() {
 		this.lasers.forEachNodo(this.moverLaserFunc);
 	}
+	
+	private Function<Nodo<Proyectil>, Void> moverLaserFunc = laser -> {
+		this.moverLaser(laser);
+		this._verificarImpactoLaserAPersonaje(laser.getElemento());
+		return null;
+	};
 
 	private void moverDino(Nodo<Velociraptor> dino) {
 		if (!dino.getElemento().colisionPiso(this.pisos))
@@ -296,6 +290,13 @@ public class Juego extends InterfaceJuego {
 	private void procesarDinos() {
 		this.dinos.forEachNodo(this.procesarDinoFunc);
 	}
+	
+	private Function<Nodo<Velociraptor>, Void> procesarDinoFunc = dino -> {
+		this.moverDino(dino);
+		this.verificarImpactoADino(dino);
+		dino.getElemento().disparar(this.lasers, this.contadorTicks);
+		return null;
+	};
 	
 	/**
 	 * Ejecuta mensaje en pantalla y finaliza la ejecución.
