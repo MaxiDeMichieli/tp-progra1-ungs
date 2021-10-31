@@ -157,10 +157,7 @@ public class Personaje {
 	public boolean esImpactado(int xIzq, int xDer, int yArr, int yAba) {
 		boolean tocandoX = xIzq < this.posicionExtremoDerecho() && this.posicionExtremoIzquierdo() < xDer;
 		boolean tocandoY = yAba > this.posicionCabeza() && this.posicionPies() > yArr;
-		if (tocandoX && tocandoY) {
-			return true;
-		}
-		return false;
+		return tocandoX && tocandoY;
 	}
 
 	public int posicionExtremoDerecho() {

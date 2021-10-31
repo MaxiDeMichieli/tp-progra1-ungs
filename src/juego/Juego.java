@@ -25,8 +25,9 @@ public class Juego extends InterfaceJuego {
 	private Piso[] pisos;
 
 	private int contadorTicks;
-
-	private int puntos;
+	
+	private int puntos; // score
+	private int eliminados; //dinos eliminados
 	private int vidas = 3;
 	
 	// 1 = Gano
@@ -136,9 +137,10 @@ public class Juego extends InterfaceJuego {
 		}
 
 		entorno.cambiarFont(Font.SANS_SERIF, 25, Color.RED);
-		entorno.escribirTexto("Enemigos Eliminados: " + this.puntos, 15, 25);
+		entorno.escribirTexto("Enemigos Eliminados: " + this.eliminados, 15, 25);
 		entorno.escribirTexto("Vidas: " + this.vidas, 80, 585);
-		entorno.dibujarRectangulo(40, 570, 50, 50, 0, Color.RED);
+		entorno.escribirTexto("Score: " + this.puntos, this.width - 150, 585);
+		entorno.dibujarRectangulo(40, 570, 50, 50, 0, Color.WHITE);
 		entorno.dibujarImagen(this.avatarVida, 40, 570, 0, 0.2);
 
 		this.contadorTicks += 1;
@@ -235,7 +237,8 @@ public class Juego extends InterfaceJuego {
 					rayo.posicionYArriba(), rayo.posicionYAbajo())) {
 				this.dinos.quitarPorId(dino.getId());
 				this.rayos.quitarPorId(nodoRayo.getId());
-				this.puntos += 1;
+				this.eliminados++;
+				this.puntos += 15;
 			}
 			return null;
 		};
@@ -249,6 +252,7 @@ public class Juego extends InterfaceJuego {
 					laser.posicionYArriba(), laser.posicionYAbajo())) {
 				this.lasers.quitarPorId(nodoLaser.getId());
 				this.rayos.quitarPorId(rayo.getId());
+				this.puntos += 5;
 			}
 			return null;
 		};
