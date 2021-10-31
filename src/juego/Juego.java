@@ -136,7 +136,8 @@ public class Juego extends InterfaceJuego {
 		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA)) {
 			// chequea que barbariana no llegue a la computadora.
 			// Si llega, termina el juego y gana
-			if (this.computadora.estaTocando(this.barbariana.getX(), this.barbariana.getY())) {
+			if (this.computadora.estaTocando(this.barbariana.posicionExtremoIzquierdo(),
+					this.barbariana.posicionExtremoDerecho(), this.barbariana.posicionCabeza(), this.barbariana.posicionPies())) {
 				this.estadoJuego = 1;
 			}
 			this.barbariana.moverDerecha(this);
