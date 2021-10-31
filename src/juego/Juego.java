@@ -25,11 +25,11 @@ public class Juego extends InterfaceJuego {
 	private Piso[] pisos;
 
 	private int contadorTicks;
-	
+
 	private int puntos; // score
-	private int eliminados; //dinos eliminados
+	private int eliminados; // dinos eliminados
 	private int vidas = 3;
-	
+
 	// 1 = Gano
 	// 0 = Perdio
 	private int estadoJuego = -1;
@@ -74,58 +74,59 @@ public class Juego extends InterfaceJuego {
 
 	// Metodo que se ejecuta todo el tiempo
 	public void tick() {
+		if (this.estadoJuego != -1) {
+			if (this.estadoJuego == 1) {
+				this.finDelJuego("Ganaste!", Color.GREEN);
+			} else if (this.estadoJuego == 0) {
+				this.finDelJuego("Perdiste", Color.RED);
+			}
+		} else {
+			// dibujar el personaje
+			this.barbariana.dibujarse(this.entorno);
 
-		// dibujar el personaje
-		this.barbariana.dibujarse(this.entorno);
+			// dibuja los pisos
+			this._dibujarPisos();
 
-		// dibuja los pisos
-		this._dibujarPisos();
+			// dibuja computadora
+			this.computadora.dibujarse(this.entorno);
 
-		// dibuja computadora
-		this.computadora.dibujarse(this.entorno);
-		
-		if(this.estadoJuego == 1) {
-			this.finDelJuego("Ganaste!", Color.GREEN);
-		}else if(this.estadoJuego == 0) {
-			this.finDelJuego("Perdiste", Color.RED);
+			// dibuja dinos
+			this._dibujarDinos();
+
+			// Se verifica el impacto del dino no solo cuando se mueve a un lado, sino
+			// tambien
+			// cuando esta quieto el personaje.
+			this._verificarImpactoDinoAPersonaje();
+
+			// metodo que maneja las acciones de acuerdo a la tecla que se presione en el
+			// momento
+			this._actualizarMovimientos();
+
+			if (this.rayos.largo() > 0) {
+				this.procesarRayos();
+			}
+
+			if (this.lasers.largo() > 0) {
+				this.moverLasers();
+			}
+
+			if (this.barbariana.getSaltando()) {
+				this.barbariana.procesarSalto(this.contadorTicks);
+			}
+
+			if (!this.barbariana.colisionPiso(this.pisos) && !this.barbariana.getSaltando()) {
+				this.barbariana.gravedad(this);
+			}
+
+			entorno.cambiarFont(Font.SANS_SERIF, 25, Color.RED);
+			entorno.escribirTexto("Enemigos Eliminados: " + this.eliminados, 15, 25);
+			entorno.escribirTexto("Vidas: " + this.vidas, 80, 585);
+			entorno.escribirTexto("Score: " + this.puntos, this.width - 150, 585);
+			entorno.dibujarRectangulo(40, 570, 50, 50, 0, Color.WHITE);
+			entorno.dibujarImagen(this.avatarVida, 40, 570, 0, 0.2);
+
+			this.contadorTicks += 1;
 		}
-
-		// dibuja dinos
-		this._dibujarDinos(); 
-
-		// Se verifica el impacto del dino no solo cuando se mueve a un lado, sino
-		// tambien
-		// cuando esta quieto el personaje.
-		this._verificarImpactoDinoAPersonaje();
-
-		// metodo que maneja las acciones de acuerdo a la tecla que se presione en el
-		// momento
-		this._actualizarMovimientos();
-
-		if (this.rayos.largo() > 0) {
-			this.procesarRayos();
-		}
-
-		if (this.lasers.largo() > 0) {
-			this.moverLasers();
-		}
-
-		if (this.barbariana.getSaltando()) {
-			this.barbariana.procesarSalto(this.contadorTicks);
-		}
-
-		if (!this.barbariana.colisionPiso(this.pisos) && !this.barbariana.getSaltando()) {
-			this.barbariana.gravedad(this);
-		}
-
-		entorno.cambiarFont(Font.SANS_SERIF, 25, Color.RED);
-		entorno.escribirTexto("Enemigos Eliminados: " + this.eliminados, 15, 25);
-		entorno.escribirTexto("Vidas: " + this.vidas, 80, 585);
-		entorno.escribirTexto("Score: " + this.puntos, this.width - 150, 585);
-		entorno.dibujarRectangulo(40, 570, 50, 50, 0, Color.WHITE);
-		entorno.dibujarImagen(this.avatarVida, 40, 570, 0, 0.2);
-
-		this.contadorTicks += 1;
 	}
 
 	/**
@@ -136,7 +137,7 @@ public class Juego extends InterfaceJuego {
 			// chequea que barbariana no llegue a la computadora.
 			// Si llega, termina el juego y gana
 			if (this.computadora.estaTocando(this.barbariana.getX(), this.barbariana.getY())) {
-				this.estadoJuego = 1; 
+				this.estadoJuego = 1;
 			}
 			this.barbariana.moverDerecha(this);
 		}
@@ -240,7 +241,7 @@ public class Juego extends InterfaceJuego {
 		};
 		this.lasers.forEachNodo(verificarImpactoARayosFunc);
 	}
-	
+
 	private void moverRayo(Nodo<Proyectil> rayo) {
 		rayo.getElemento().moverse();
 		rayo.getElemento().dibujarse(this.entorno);
@@ -260,7 +261,7 @@ public class Juego extends InterfaceJuego {
 	private void procesarRayos() {
 		this.rayos.forEachNodo(this.procesarRayoFunc);
 	}
-	
+
 	private Function<Nodo<Proyectil>, Void> procesarRayoFunc = rayo -> {
 		this.moverRayo(rayo);
 		this.verificarImpactoALaser(rayo);
@@ -270,7 +271,7 @@ public class Juego extends InterfaceJuego {
 	private void moverLasers() {
 		this.lasers.forEachNodo(this.moverLaserFunc);
 	}
-	
+
 	private Function<Nodo<Proyectil>, Void> moverLaserFunc = laser -> {
 		this.moverLaser(laser);
 		this._verificarImpactoLaserAPersonaje(laser.getElemento());
@@ -290,33 +291,30 @@ public class Juego extends InterfaceJuego {
 	private void procesarDinos() {
 		this.dinos.forEachNodo(this.procesarDinoFunc);
 	}
-	
+
 	private Function<Nodo<Velociraptor>, Void> procesarDinoFunc = dino -> {
 		this.moverDino(dino);
 		this.verificarImpactoADino(dino);
 		dino.getElemento().disparar(this.lasers, this.contadorTicks);
 		return null;
 	};
-	
+
 	/**
 	 * Ejecuta mensaje en pantalla y finaliza la ejecución.
 	 */
 	private void finDelJuego(String message, Color color) {
 		entorno.cambiarFont(Font.SANS_SERIF, 30, color);
-		entorno.escribirTexto(message, this.width / 2, 40);
-		
-		//ejecuta una funcion despues de determinado tiempo en ms (milisegundos)
-		new java.util.Timer().schedule( 
-			new java.util.TimerTask() { 
-				public void run() { 
-					System.exit(0);
-				}
-			},500 
-		);
+		entorno.escribirTexto(message, this.width / 2 - 50, this.height / 2);
+
+		// ejecuta una funcion despues de determinado tiempo en ms (milisegundos)
+		new java.util.Timer().schedule(new java.util.TimerTask() {
+			public void run() {
+				System.exit(0);
+			}
+		}, 4000);
 	}
-	
-	
-	//Getter and setters
+
+	// Getter and setters
 
 	public Entorno getEntorno() {
 		return entorno;
@@ -469,7 +467,7 @@ public class Juego extends InterfaceJuego {
 	public void setVerificarImpactoDinoAPersonajeFunc(Function<Velociraptor, Void> verificarImpactoDinoAPersonajeFunc) {
 		this.verificarImpactoDinoAPersonajeFunc = verificarImpactoDinoAPersonajeFunc;
 	}
-	
+
 	public int getEstadoJuego() {
 		return this.estadoJuego;
 	}
