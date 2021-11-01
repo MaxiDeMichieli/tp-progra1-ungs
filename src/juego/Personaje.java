@@ -16,7 +16,8 @@ public class Personaje {
 	private Direccion direccion;
 	private int ultimoDisparo;
 	private Image avatar;
-
+	private Image avatarIzq;
+	
 	Personaje(String name) {
 		this.x = 50;
 		this.y = 505;
@@ -26,6 +27,7 @@ public class Personaje {
 		this.name = name;
 		this.direccion = Direccion.DERECHA;
 		this.avatar = Herramientas.cargarImagen("barbariana.jpeg");
+		this.avatarIzq= Herramientas.cargarImagen("barbarianaIzq.jpg");
 	}
 
 	public void moverIzquierda(Juego j) {
@@ -72,10 +74,15 @@ public class Personaje {
 	}
 
 	public void dibujarse(Entorno e) {
-		e.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.BLACK);
-		e.dibujarImagen(this.avatar, this.x, this.y, 0, 0.2);
+		if (this.direccion.equals(Direccion.DERECHA)) {
+			e.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.BLACK);
+			e.dibujarImagen(this.avatar, this.x, this.y, 0, 0.2);
+		}
+		if (this.direccion.equals(Direccion.IZQUIERDA)){
+			e.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.BLACK);
+			e.dibujarImagen(this.avatarIzq, this.x, this.y, 0, 0.2);
+		}
 	}
-
 	public void disparar(Lista<Proyectil> rayos, int contadorTicks) {
 		rayos.agregarAtras(new Proyectil(this.x, this.y - 10, this.direccion, Color.YELLOW));
 		this.ultimoDisparo = contadorTicks;
