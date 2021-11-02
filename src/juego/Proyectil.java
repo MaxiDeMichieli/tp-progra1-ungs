@@ -34,10 +34,7 @@ public class Proyectil {
 	public boolean esImpactado(int xIzq, int xDer, int yArr, int yAba) {
 		boolean tocandoX = xIzq < this.posicionExtremoDerecho() && this.posicionExtremoIzquierdo() < xDer;
 		boolean tocandoY = yAba > this.posicionYArriba() && this.posicionYAbajo() > yArr;
-		if (tocandoX && tocandoY) {
-			return true;
-		}
-		return false;
+		return tocandoX && tocandoY;
 	}
 
 	public boolean estaEnPantalla(Entorno entorno) {

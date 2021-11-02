@@ -3,7 +3,6 @@ package juego;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
-import java.util.function.Function;
 import entorno.Herramientas;
 import entorno.Entorno;
 import entorno.InterfaceJuego;
@@ -35,12 +34,10 @@ public class Juego extends InterfaceJuego {
 	private int estadoJuego = -1;
 
 	private int tickUltimoDino;
-	private Lista<Proyectil> rayos;
 	private Lista<Velociraptor> dinos;
 	private Lista<Proyectil> lasers;
 
 	Juego() {
-
 		// Inicializa alto y ancho
 		this.height = 600;
 		this.width = 800;
@@ -52,7 +49,6 @@ public class Juego extends InterfaceJuego {
 
 		// Inicializa el personaje
 		this.barbariana = new Personaje("Barbariana");
-		this.rayos = new Lista<Proyectil>();
 
 		this.avatarVida = Herramientas.cargarImagen("vida.png");
 
@@ -90,8 +86,15 @@ public class Juego extends InterfaceJuego {
 			// dibuja computadora
 			this.computadora.dibujarse(this.entorno);
 
-			// dibuja dinos
-			this._dibujarDinos();
+			// crea y procesa dinos
+			this._crearDinos();
+			if (this.dinos.largo() > 0) {
+				this.procesarDinos();
+			}
+
+			if (this.lasers.largo() > 0) {
+				this.procesarLasers();
+			}
 
 			// Se verifica el impacto del dino no solo cuando se mueve a un lado, sino
 			// tambien
@@ -102,12 +105,8 @@ public class Juego extends InterfaceJuego {
 			// momento
 			this._actualizarMovimientos();
 
-			if (this.rayos.largo() > 0) {
+			if (this.barbariana.getRayos().largo() > 0) {
 				this.procesarRayos();
-			}
-
-			if (this.lasers.largo() > 0) {
-				this.moverLasers();
 			}
 
 			if (this.barbariana.getSaltando()) {
@@ -163,7 +162,7 @@ public class Juego extends InterfaceJuego {
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_ESPACIO) && this.barbariana.colisionPiso(this.pisos)
 				&& this.barbariana.getUltimoDisparo() + 50 <= this.contadorTicks) {
-			this.barbariana.disparar(this.rayos, this.contadorTicks);
+			this.barbariana.disparar(this.contadorTicks);
 		}
 	}
 
@@ -182,12 +181,11 @@ public class Juego extends InterfaceJuego {
 		this.pisos = pisosList;
 	}
 
-	private void _dibujarDinos() {
+	private void _crearDinos() {
 		if (this.tickUltimoDino == -1 || (this.dinos.largo() <= 6 && this.tickUltimoDino + 300 < this.contadorTicks)) {
 			this.dinos.agregarAtras(new Velociraptor());
 			this.tickUltimoDino = this.contadorTicks;
 		}
-		this.procesarDinos();
 	}
 
 	private void _dibujarPisos() {
@@ -196,16 +194,14 @@ public class Juego extends InterfaceJuego {
 		}
 	}
 
-	private Function<Velociraptor, Void> verificarImpactoDinoAPersonajeFunc = dino -> {
-		if (this.barbariana.esImpactado(dino.posicionExtremoIzquierdo(), dino.posicionExtremoDerecho(),
-				dino.posicionCabeza(), dino.posicionPies())) {
-			this.estadoJuego = 0;
-		}
-		return null;
-	};
-
 	private void _verificarImpactoDinoAPersonaje() {
-		this.dinos.forEachElement(this.verificarImpactoDinoAPersonajeFunc);
+		this.dinos.forEachElement(dino -> {
+			if (this.barbariana.esImpactado(dino.posicionExtremoIzquierdo(), dino.posicionExtremoDerecho(),
+					dino.posicionCabeza(), dino.posicionPies())) {
+				this.estadoJuego = 0;
+			}
+			return null;
+		});
 	}
 
 	private void _verificarImpactoLaserAPersonaje(Proyectil laser) {
@@ -214,91 +210,84 @@ public class Juego extends InterfaceJuego {
 			this.estadoJuego = 0;
 	}
 
-	private void verificarImpactoADino(Nodo<Velociraptor> dino) {
-		Function<Nodo<Proyectil>, Void> verificarImpactoARayosFunc = nodoRayo -> {
+	private void verificarImpactoRayoADino(Nodo<Velociraptor> nodoDino) {
+		this.barbariana.getRayos().forEachNodo(nodoRayo -> {
 			Proyectil rayo = nodoRayo.getElemento();
-			if (dino.getElemento().esImpactado(rayo.posicionExtremoIzquierdo(), rayo.posicionExtremoDerecho(),
+			if (nodoDino.getElemento().esImpactado(rayo.posicionExtremoIzquierdo(), rayo.posicionExtremoDerecho(),
 					rayo.posicionYArriba(), rayo.posicionYAbajo())) {
-				this.dinos.quitarPorId(dino.getId());
-				this.rayos.quitarPorId(nodoRayo.getId());
+				this.dinos.quitarPorId(nodoDino.getId());
+				this.barbariana.getRayos().quitarPorId(nodoRayo.getId());
 				this.eliminados++;
 				this.puntos += 15;
 			}
 			return null;
-		};
-		this.rayos.forEachNodo(verificarImpactoARayosFunc);
+		});
 	}
 
-	private void verificarImpactoALaser(Nodo<Proyectil> rayo) {
-		Function<Nodo<Proyectil>, Void> verificarImpactoARayosFunc = nodoLaser -> {
+	private void verificarImpactoRayoALaser(Nodo<Proyectil> nodoRayo) {
+		this.lasers.forEachNodo(nodoLaser -> {
 			Proyectil laser = nodoLaser.getElemento();
-			if (rayo.getElemento().esImpactado(laser.posicionExtremoIzquierdo(), laser.posicionExtremoDerecho(),
+			if (nodoRayo.getElemento().esImpactado(laser.posicionExtremoIzquierdo(), laser.posicionExtremoDerecho(),
 					laser.posicionYArriba(), laser.posicionYAbajo())) {
 				this.lasers.quitarPorId(nodoLaser.getId());
-				this.rayos.quitarPorId(rayo.getId());
+				this.barbariana.getRayos().quitarPorId(nodoRayo.getId());
 				this.puntos += 5;
 			}
 			return null;
-		};
-		this.lasers.forEachNodo(verificarImpactoARayosFunc);
+		});
 	}
 
-	private void moverRayo(Nodo<Proyectil> rayo) {
-		rayo.getElemento().moverse();
-		rayo.getElemento().dibujarse(this.entorno);
-		if (!rayo.getElemento().estaEnPantalla(this.entorno)) {
-			rayos.quitarPorId(rayo.getId());
+	private void moverRayo(Nodo<Proyectil> nodoRayo) {
+		nodoRayo.getElemento().moverse();
+		nodoRayo.getElemento().dibujarse(this.entorno);
+		if (!nodoRayo.getElemento().estaEnPantalla(this.entorno)) {
+			this.barbariana.getRayos().quitarPorId(nodoRayo.getId());
 		}
 	}
 
-	private void moverLaser(Nodo<Proyectil> laser) {
-		laser.getElemento().moverse();
-		laser.getElemento().dibujarse(this.entorno);
-		if (!laser.getElemento().estaEnPantalla(this.entorno)) {
-			lasers.quitarPorId(laser.getId());
+	private void moverLaser(Nodo<Proyectil> nodoLaser, Lista<Proyectil> lista) {
+		nodoLaser.getElemento().moverse();
+		nodoLaser.getElemento().dibujarse(this.entorno);
+		if (!nodoLaser.getElemento().estaEnPantalla(this.entorno)) {
+			lista.quitarPorId(nodoLaser.getId());
 		}
 	}
 
 	private void procesarRayos() {
-		this.rayos.forEachNodo(this.procesarRayoFunc);
+		this.barbariana.getRayos().forEachNodo(rayo -> {
+			this.moverRayo(rayo);
+			this.verificarImpactoRayoALaser(rayo);
+			return null;
+		});
 	}
 
-	private Function<Nodo<Proyectil>, Void> procesarRayoFunc = rayo -> {
-		this.moverRayo(rayo);
-		this.verificarImpactoALaser(rayo);
-		return null;
-	};
-
-	private void moverLasers() {
-		this.lasers.forEachNodo(this.moverLaserFunc);
-	}
-
-	private Function<Nodo<Proyectil>, Void> moverLaserFunc = laser -> {
-		this.moverLaser(laser);
-		this._verificarImpactoLaserAPersonaje(laser.getElemento());
-		return null;
-	};
-
-	private void moverDino(Nodo<Velociraptor> dino) {
-		if (!dino.getElemento().colisionPiso(this.pisos))
-			dino.getElemento().gravedad(this);
-		dino.getElemento().avanzar(this.pisos);
-		dino.getElemento().dibujarse(this.entorno);
-		if (!dino.getElemento().estaEnPantalla(this.entorno)) {
-			dinos.quitarPorId(dino.getId());
-		}
+	private void procesarLasers() {
+		this.lasers.forEachNodo(nodoLaser -> {
+			this.moverLaser(nodoLaser, this.lasers);
+			this._verificarImpactoLaserAPersonaje(nodoLaser.getElemento());
+			return null;
+		});
 	}
 
 	private void procesarDinos() {
-		this.dinos.forEachNodo(this.procesarDinoFunc);
+		this.dinos.forEachNodo(nodoDino -> {
+			this.moverDino(nodoDino);
+			this.verificarImpactoRayoADino(nodoDino);
+			nodoDino.getElemento().disparar(this.lasers, this.contadorTicks);
+			return null;
+		});
 	}
 
-	private Function<Nodo<Velociraptor>, Void> procesarDinoFunc = dino -> {
-		this.moverDino(dino);
-		this.verificarImpactoADino(dino);
-		dino.getElemento().disparar(this.lasers, this.contadorTicks);
-		return null;
-	};
+	private void moverDino(Nodo<Velociraptor> nodoDino) {
+		Velociraptor dino = nodoDino.getElemento();
+		if (!dino.colisionPiso(this.pisos))
+			dino.gravedad(this);
+		dino.avanzar(this.pisos);
+		dino.dibujarse(this.entorno);
+		if (!dino.estaEnPantalla(this.entorno)) {
+			dinos.quitarPorId(nodoDino.getId());
+		}
+	}
 
 	/**
 	 * Ejecuta mensaje en pantalla y finaliza la ejecución.
@@ -315,7 +304,7 @@ public class Juego extends InterfaceJuego {
 		}, 4000);
 	}
 
-	// Getter and setters
+	// Getters and setters
 
 	public Entorno getEntorno() {
 		return entorno;
@@ -405,22 +394,6 @@ public class Juego extends InterfaceJuego {
 		this.vidas = vidas;
 	}
 
-	public Lista<Proyectil> getRayos() {
-		return rayos;
-	}
-
-	public void setRayos(Lista<Proyectil> rayos) {
-		this.rayos = rayos;
-	}
-
-	public Function<Nodo<Proyectil>, Void> getProcesarRayoFunc() {
-		return procesarRayoFunc;
-	}
-
-	public void setProcesarRayoFunc(Function<Nodo<Proyectil>, Void> procesarRayoFunc) {
-		this.procesarRayoFunc = procesarRayoFunc;
-	}
-
 	public int getTickUltimoDino() {
 		return tickUltimoDino;
 	}
@@ -435,38 +408,6 @@ public class Juego extends InterfaceJuego {
 
 	public void setDinos(Lista<Velociraptor> dinos) {
 		this.dinos = dinos;
-	}
-
-	public Function<Nodo<Velociraptor>, Void> getProcesarDinoFunc() {
-		return procesarDinoFunc;
-	}
-
-	public void setProcesarDinoFunc(Function<Nodo<Velociraptor>, Void> procesarDinoFunc) {
-		this.procesarDinoFunc = procesarDinoFunc;
-	}
-
-	public Lista<Proyectil> getLasers() {
-		return lasers;
-	}
-
-	public void setLasers(Lista<Proyectil> lasers) {
-		this.lasers = lasers;
-	}
-
-	public Function<Nodo<Proyectil>, Void> getMoverLaserFunc() {
-		return moverLaserFunc;
-	}
-
-	public void setMoverLaserFunc(Function<Nodo<Proyectil>, Void> moverLaserFunc) {
-		this.moverLaserFunc = moverLaserFunc;
-	}
-
-	public Function<Velociraptor, Void> getVerificarImpactoDinoAPersonajeFunc() {
-		return verificarImpactoDinoAPersonajeFunc;
-	}
-
-	public void setVerificarImpactoDinoAPersonajeFunc(Function<Velociraptor, Void> verificarImpactoDinoAPersonajeFunc) {
-		this.verificarImpactoDinoAPersonajeFunc = verificarImpactoDinoAPersonajeFunc;
 	}
 
 	public int getEstadoJuego() {

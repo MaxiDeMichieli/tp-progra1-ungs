@@ -17,7 +17,8 @@ public class Personaje {
 	private int ultimoDisparo;
 	private Image avatar;
 	private Image avatarIzq;
-				
+	private Lista<Proyectil> rayos;
+
 	Personaje(String name) {
 		this.x = 50;
 		this.y = 505;
@@ -27,7 +28,8 @@ public class Personaje {
 		this.name = name;
 		this.direccion = Direccion.DERECHA;
 		this.avatar = Herramientas.cargarImagen("barbariana.jpeg");
-		this.avatarIzq= Herramientas.cargarImagen("barbarianaIzq.jpg");
+		this.avatarIzq = Herramientas.cargarImagen("barbarianaIzq.jpg");
+		this.rayos = new Lista<Proyectil>();
 	}
 
 	public void moverIzquierda(Juego j) {
@@ -75,16 +77,17 @@ public class Personaje {
 
 	public void dibujarse(Entorno e) {
 		if (this.direccion.equals(Direccion.DERECHA)) {
-			e.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.BLACK);
+			e.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, new Color(0, 0, 0, 0));
 			e.dibujarImagen(this.avatar, this.x, this.y, 0, 0.2);
 		}
-		if (this.direccion.equals(Direccion.IZQUIERDA)){
-			e.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.BLACK);
+		if (this.direccion.equals(Direccion.IZQUIERDA)) {
+			e.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, new Color(0, 0, 0, 0));
 			e.dibujarImagen(this.avatarIzq, this.x, this.y, 0, 0.2);
 		}
 	}
-	public void disparar(Lista<Proyectil> rayos, int contadorTicks) {
-		rayos.agregarAtras(new Proyectil(this.x, this.y - 10, this.direccion, Color.YELLOW));
+
+	public void disparar(int contadorTicks) {
+		this.rayos.agregarAtras(new Proyectil(this.x, this.y - 10, this.direccion, Color.YELLOW));
 		this.ultimoDisparo = contadorTicks;
 	}
 
@@ -229,5 +232,13 @@ public class Personaje {
 
 	public int getUltimoDisparo() {
 		return this.ultimoDisparo;
+	}
+
+	public Lista<Proyectil> getRayos() {
+		return this.rayos;
+	}
+
+	public void setRayos(Lista<Proyectil> rayos) {
+		this.rayos = rayos;
 	}
 }

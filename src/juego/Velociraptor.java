@@ -29,7 +29,7 @@ public class Velociraptor {
 	}
 
 	public void dibujarse(Entorno entorno) {
-		entorno.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, Color.BLACK);
+		entorno.dibujarRectangulo(this.x, this.y, this.ancho, this.alto, 0, new Color(0, 0, 0, 0));
 		if (this.direccion.equals(Direccion.IZQUIERDA))
 			entorno.dibujarImagen(this.avatarIzq, this.x, this.y, 0, 1);
 		if (this.direccion.equals(Direccion.DERECHA))
@@ -56,9 +56,11 @@ public class Velociraptor {
 
 	public void disparar(Lista<Proyectil> lasers, int contadorTicks) {
 		if (this.proximoDisparo < contadorTicks) {
-			if (this.proximoDisparo != 0)
-				lasers.agregarAtras(new Proyectil(this.x, this.y - 10, this.direccion, Color.RED));
-			this.proximoDisparo = contadorTicks + (int) Math.floor(Math.random() * (250 - 150 + 1) + 150);
+			if (this.proximoDisparo != 0) {
+				int y = randomEntre(0, 1) == 0 ? this.y - 10 : this.y + 15;
+				lasers.agregarAtras(new Proyectil(this.x, y, this.direccion, Color.RED));
+			}
+			this.proximoDisparo = contadorTicks + this.randomEntre(150, 250);
 		}
 	}
 
@@ -91,10 +93,11 @@ public class Velociraptor {
 	public boolean esImpactado(int xIzq, int xDer, int yArr, int yAba) {
 		boolean tocandoX = xIzq < this.posicionExtremoDerecho() && this.posicionExtremoIzquierdo() < xDer;
 		boolean tocandoY = yAba > this.posicionCabeza() && this.posicionPies() > yArr;
-		if (tocandoX && tocandoY) {
-			return true;
-		}
-		return false;
+		return tocandoX && tocandoY;
+	}
+
+	private int randomEntre(int n1, int n2) {
+		return (int) Math.floor(Math.random() * (n2 - n1 + 1) + n1);
 	}
 
 	public int posicionExtremoDerecho() {
