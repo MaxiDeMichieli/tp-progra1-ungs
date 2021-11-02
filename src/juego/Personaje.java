@@ -17,7 +17,7 @@ public class Personaje {
 	private int ultimoDisparo;
 	private Image avatar;
 	private Image avatarIzq;
-	
+				
 	Personaje(String name) {
 		this.x = 50;
 		this.y = 505;
