@@ -2,8 +2,6 @@ package juego;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Image;
-import entorno.Herramientas;
 import entorno.Entorno;
 import entorno.InterfaceJuego;
 import utils.Lista;
@@ -14,7 +12,7 @@ public class Juego extends InterfaceJuego {
 	private Entorno entorno;
 	private Personaje barbariana;
 	private Computadora computadora;
-	private Image avatarVida;
+	 
 
 	// Ancho y alto del juego;
 	private int height;
@@ -27,7 +25,6 @@ public class Juego extends InterfaceJuego {
 
 	private int puntos; // score
 	private int eliminados; // dinos eliminados
-	private int vidas = 3;
 
 	// 1 = Gano
 	// 0 = Perdio
@@ -49,8 +46,6 @@ public class Juego extends InterfaceJuego {
 
 		// Inicializa el personaje
 		this.barbariana = new Personaje("Barbariana");
-
-		this.avatarVida = Herramientas.cargarImagen("vida.png");
 
 		// Inicializa dinos
 		this.dinos = new Lista<Velociraptor>();
@@ -119,10 +114,7 @@ public class Juego extends InterfaceJuego {
 
 			entorno.cambiarFont(Font.SANS_SERIF, 25, Color.RED);
 			entorno.escribirTexto("Enemigos Eliminados: " + this.eliminados, 15, 25);
-			entorno.escribirTexto("Vidas: " + this.vidas, 80, 585);
 			entorno.escribirTexto("Score: " + this.puntos, this.width - 150, 585);
-			entorno.dibujarRectangulo(40, 570, 50, 50, 0, Color.WHITE);
-			entorno.dibujarImagen(this.avatarVida, 40, 570, 0, 0.2);
 
 			this.contadorTicks += 1;
 		}
@@ -330,14 +322,6 @@ public class Juego extends InterfaceJuego {
 		this.computadora = computadora;
 	}
 
-	public Image getAvatarVida() {
-		return avatarVida;
-	}
-
-	public void setAvatarVida(Image avatarVida) {
-		this.avatarVida = avatarVida;
-	}
-
 	public int getHeight() {
 		return height;
 	}
@@ -386,13 +370,6 @@ public class Juego extends InterfaceJuego {
 		this.puntos = puntos;
 	}
 
-	public int getVidas() {
-		return vidas;
-	}
-
-	public void setVidas(int vidas) {
-		this.vidas = vidas;
-	}
 
 	public int getTickUltimoDino() {
 		return tickUltimoDino;
